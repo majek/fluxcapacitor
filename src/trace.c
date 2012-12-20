@@ -185,7 +185,7 @@ int trace_process_count(struct trace *trace) {
 static int mem_fd_open(int pid) {
 	char path[64];
 	snprintf(path, sizeof(path), "/proc/%i/mem", pid);
-	return open(path, O_RDWR | O_CLOEXEC);
+	return open(path, O_RDONLY | O_CLOEXEC);
 }
 
 static struct trace_process *trace_process_new(struct trace *trace, int pid) {
@@ -517,8 +517,6 @@ static int copy_to_user_ptrace(struct trace_process *process, unsigned long dst,
 
 static int copy_from_user_fd(struct trace_process *process, void *dst,
 			     unsigned long src, size_t len) {
-	close(process->mem_fd);
-	process->mem_fd = mem_fd_open(process->pid);
 	int r = pread(process->mem_fd, dst, len, src);
 	if (r < 0)
 		PFATAL("pread(\"/proc/%i/mem\", offset=0x%lx, len=%u) = %i",
