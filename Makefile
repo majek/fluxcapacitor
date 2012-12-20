@@ -6,9 +6,9 @@ LDOPTS=-lrt -ldl -rdynamic
 COPTS=-g -Wall -Wextra -Wno-unused-parameter -O3
 # -fprofile-arcs -pg
 
-TESTLIB_FILES=testlib.c
-LIB_FILES=preload.c
-LOADER_FILES=wrapper.c parent.c loader.c uevent.c trace.c main.c
+TESTLIB_FILES=src/testlib.c
+LIB_FILES=src/preload.c
+LOADER_FILES=src/wrapper.c src/parent.c src/loader.c src/uevent.c src/trace.c src/main.c
 
 all:
 	gcc $(COPTS) $(TESTLIB_FILES)       -fPIC -shared -Wl,-soname,$(TESTLIBNAME) -o $(TESTLIBNAME)	
