@@ -376,13 +376,16 @@ static void process_evaluate(struct trace *trace,
 			process->callback(process, TRACE_EXIT, &exitarg,
 					  process->userdata);
 			trace_process_del(trace, process);
+			return;
 		} else {
 			SHOUT("pid=%i status 0x%x not understood!", process->pid, status);
 		}
 	}
 
-	ptrace(PTRACE_SYSCALL, process->pid, 0, inject_signal);
 
+	int r = ptrace(PTRACE_SYSCALL, process->pid, 0, inject_signal);
+	if (r < 0)
+		PFATAL("ptrace(PTRACE_SYSCALL)");
 }
 
 
