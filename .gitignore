@@ -1,3 +1,6 @@
 fluxcapacitor_preload.so
 fluxcapacitor_test.so
 fluxcapacitor
+*.gcda
+gmon.out
+*.pyc
