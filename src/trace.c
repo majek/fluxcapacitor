@@ -243,7 +243,7 @@ int trace_execvp(struct trace *trace, char **argv) {
 			PFATAL("ptrace(PTRACE_TRACEME)");
 		// Wait for the parent to catch up.
 		raise(SIGSTOP);
-		
+
 		execvp(argv[0], argv);
 		PFATAL("execvp()");
 	}

@@ -23,7 +23,7 @@
 			fprintf(options.shoutstream, x);	\
 			fprintf(options.shoutstream, "\n");	\
 		}						\
-	}while(0)
+	} while (0)
 
 struct options {
 	/* Path to .so files */

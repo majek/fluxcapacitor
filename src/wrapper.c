@@ -53,13 +53,13 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 		}
 		type = TYPE_TIMESPEC; value = sysarg->arg1;
 		break;
-		
+
 	case SYS_futex:
 		if (sysarg->arg2 == FUTEX_WAIT || sysarg->arg2 == FUTEX_WAIT_PRIVATE) {
 			type = TYPE_TIMESPEC; value = sysarg->arg4;
 		}
 		break;
-		
+
 	/* case SYS_waitpid: */
 	/* 	if (!(sysarg->arg3 & WNOHANG)) { */
 	/* 		type = TYPE_FOREVER; */
@@ -78,7 +78,7 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 			timeout = MSEC_NSEC(value);
 		}
 		break;
-		
+
 	case TYPE_TIMEVAL:
 		if (value == 0 ) { /* NULL */
 			timeout = TIMEOUT_FOREVER;
@@ -95,7 +95,7 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 		} else {
 			struct timespec ts;
 			copy_from_user(child->process, &ts, value, sizeof(struct timespec));
-			timeout = TIMESPEC_NSEC(&ts);			
+			timeout = TIMESPEC_NSEC(&ts);
 		}
 		break;
 
@@ -106,10 +106,10 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 	default:
 		FATAL("");
 	}
-	
+
 	child->blocked_timeout = timeout;
 	child->syscall_no = sysarg->number;
-	
+
 }
 
 int wrapper_syscall_exit(struct child *child, struct trace_sysarg *sysarg) {

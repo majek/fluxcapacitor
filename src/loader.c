@@ -81,7 +81,6 @@ int argv_join(char *dst, int dst_sz, char **argv, const char *delimiter) {
 	}
 }
 
-
 #define PATH_DELIMITER "/"
 
 static int dl_checkpath(const char *path_prefix, const char *solib) {
@@ -121,9 +120,9 @@ void ensure_libpath(const char *argv_0) {
 			if (dl_checkpath(path, TEST_LIBNAME)) break;
 
 			// 3. Give up.
-			path = NULL;			
+			path = NULL;
 		} while(0);
-		
+
 		if (!path) {
 			FATAL("Unable to load library \"" PRELOAD_LIBNAME "\", "
 			      "most likely I tried a wrong path. "
@@ -146,7 +145,7 @@ void ldpreload_extend(const char *lib_path, const char *file) {
         } else {
                 snprintf(pathname, sizeof(pathname), "%s", file);
         }
-        
+
         char ld_preload[PATH_MAX];
         char *prev_ld_preload = getenv("LD_PRELOAD");
 

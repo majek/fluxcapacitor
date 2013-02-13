@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
 		case 'q':
 			options.quiet = 1;
 			break;
-			
+
 		case 'h':
 			usage();
 			break;
