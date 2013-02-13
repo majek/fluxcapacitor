@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ptrace.h>
+#include <asm/ptrace.h>
 #include <sys/wait.h>
 #include <errno.h>
 #include <sys/signalfd.h>
@@ -35,7 +36,7 @@ extern struct options options;
 #define HPIDS_SIZE 51
 
 
-#if defined(__x86_64__) || defined(__i386__)
+#if defined(__x86_64__)
 
 /* On x86-64, RAX is set to -ENOSYS on system call entry.  How
    do we distinguish this from a system call that returns
@@ -43,31 +44,29 @@ extern struct options options;
 # define SYSCALL_ENTRY (RET == -ENOSYS)
 # define REGS_STRUCT struct user_regs_struct
 
-# if defined(__x86_64__)
+# define SYSCALL (regs.orig_rax)
+# define ARG1 (regs.rdi)
+# define ARG2 (regs.rsi)
+# define ARG3 (regs.rdx)
+# define ARG4 (regs.r10)
+# define ARG5 (regs.r8)
+# define ARG6 (regs.r9)
+# define RET (regs.rax)
 
-#  define SYSCALL (regs.orig_rax)
-#  define ARG1 (regs.rdi)
-#  define ARG2 (regs.rsi)
-#  define ARG3 (regs.rdx)
-#  define ARG4 (regs.r10)
-#  define ARG5 (regs.r8)
-#  define ARG6 (regs.r9)
-#  define RET (regs.rax)
+#elif defined(__i386__)
 
-# elif defined(__i386__)
+# define SYSCALL_ENTRY (RET == -ENOSYS)
+# define REGS_STRUCT struct user_regs_struct
+# define SYSCALL (regs.orig_eax)
+# define ARG1 (regs.ebx)
+# define ARG2 (regs.ecx)
+# define ARG3 (regs.edx)
+# define ARG4 (regs.esi)
+# define ARG5 (regs.edi)
+# define ARG6 (regs.ebp)
+# define RET (regs.eax)
 
-#  define SYSCALL (regs.orig_eax)
-#  define ARG1 (regs.ebx)
-#  define ARG2 (regs.ecx)
-#  define ARG3 (regs.edx)
-#  define ARG4 (regs.esi)
-#  define ARG5 (regs.edi)
-#  define ARG6 (regs.ebp)
-#  define RET (regs.eax)
-
-#endif
-
-#elif defined(__arm__)
+#elif defined(__ARMEL__)
 
 # define REGS_STRUCT struct pt_regs
 /* ip is set to 0 on system call entry, 1 on exit.  */
