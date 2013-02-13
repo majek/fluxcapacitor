@@ -25,7 +25,7 @@ class TestCase(unittest.TestCase):
         rc = subprocess.call(cmd, shell=True)
         self.assertEqual(rc, returncode)
         return True
-        
+
     def system(self, cmd, returncode=0):
         if self.fcpath:
             final_cmd = "%s -- %s" % (self.fcpath, cmd)
@@ -63,7 +63,7 @@ def compile(code=None):
                 cc_cmd = "%s %s -Os -Wall %s -o %s" % (os.getenv('CC', 'cc'), os.getenv('CFLAGS', ''), source, compiled)
                 rc = subprocess.call(cc_cmd, shell=True)
                 self.assertEqual(rc, 0)
-            
+
                 kwargs['compiled'] = compiled
                 ret = fn(self, *args, **kwargs)
             finally:

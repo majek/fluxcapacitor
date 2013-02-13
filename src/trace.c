@@ -204,26 +204,6 @@ static void trace_process_del(struct trace *trace, struct trace_process *process
 	free(process);
 }
 
-#if 0
-static void close_spare_fds() {
-	DIR *d = opendir("/proc/self/fd");
-
-	if (d) {
-		struct dirent* de;
-		while ((de = readdir(d))) {
-			int i = atoi(de->d_name);
-			if (i > 2) close(i);
-		}
-		closedir(d);
-	} else {
-		int i;
-		for (i = 3; i < 256; i++) 
-			close(i);
-		return;
-	}
-}
-#endif
-
 int trace_execvp(struct trace *trace, char **argv) {
 	int pid = fork();
 	if (pid == -1)
