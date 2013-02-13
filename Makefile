@@ -4,16 +4,26 @@ LOADERNAME=fluxcapacitor
 
 LDOPTS=-lrt -ldl -rdynamic
 COPTS=-g -Wall -Wextra -Wno-unused-parameter -O3
-# -fprofile-arcs -pg
 
 TESTLIB_FILES=src/testlib.c
 LIB_FILES=src/preload.c
 LOADER_FILES=src/wrapper.c src/parent.c src/loader.c src/uevent.c src/trace.c src/main.c
 
-all:
+all: $(TESTLIBNAME) $(LIBNAME) $(LOADERNAME) test
+
+$(TESTLIBNAME): Makefile $(TESTLIB_FILES)
 	gcc $(COPTS) $(TESTLIB_FILES)       -fPIC -shared -Wl,-soname,$(TESTLIBNAME) -o $(TESTLIBNAME)
+
+$(LIBNAME): Makefile $(LIB_FILES)
 	gcc $(COPTS) $(LIB_FILES) $(LDOPTS) -fPIC -shared -Wl,-soname,$(LIBNAME) -o $(LIBNAME)
+
+$(LOADERNAME): Makefile $(LOADER_FILES)
 	gcc $(COPTS) $(LOADER_FILES) $(LDOPTS) -o $(LOADERNAME)
+
+
+.PHONY:test
+test:
+	FCPATH="$(PWD)/$(LOADERNAME) -q --libpath=$(PWD)" python tests/tests_basic.py
 
 clean:
 	rm -f *.gcda *.so fluxcapacitor a.out gmon.out
