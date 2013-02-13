@@ -54,7 +54,6 @@ int main(int argc, char **argv) {
 	optind = 1;
 	while (1) {
 		int option_index = 0;
-		const char *opt_name;
 		static struct option long_options[] = {
 			{"libpath",  required_argument, 0,  0  },
 			{"help",     no_argument,       0, 'h' },
@@ -69,10 +68,10 @@ int main(int argc, char **argv) {
 		if (arg == -1) {
 			break;
 		}
-		
+
 		switch (arg) {
-		case 0:
-			opt_name = long_options[option_index].name;
+		case 0: {
+			const char *opt_name = long_options[option_index].name;
 			if (0 == strcasecmp(opt_name, "libpath")) {
 				options.libpath = strdup(optarg);
 			} else if (0 == strcasecmp(opt_name, "signal")) {
@@ -86,7 +85,7 @@ int main(int argc, char **argv) {
 			} else {
 				FATAL("Unknown option: %s", argv[optind]);
 			}
-			break;
+			break; }
 
 		case 'q':
 			options.quiet = 1;
