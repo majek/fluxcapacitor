@@ -1,21 +1,29 @@
 Fluxcapacitor
 ----
 
-Fluxcapacitor is a tool for Linux, originally created to speed up
-[SockJS](http://sockjs.org) tests.
+Fluxcapacitor is a tool for Linux, created to speed up tests.
 
 It is somewhat similar to tools like:
 
  * [FreezeGun](http://stevepulec.com/freezegun/) for Python
  * [timecop](https://github.com/travisjeffery/timecop) or
    [Delorean](https://github.com/bebanjo/delorean) for Ruby
- 
-Instead of patching time libraries in high level programming language,
-Fluxcapacitor "patches" low-level syscalls using `ptrace` on Linux.
 
-This approach has a significant advantage: now you can run more than
-one independent processes that will be affected by speeding up the
-time. This is especially useful for testing network protocols.
+These tools patch/mock time libraries in a programming
+language.
+
+Fluxcapacitor on the other hand "patches" low-level syscalls. That way
+it can lie about time to any program in any programming language, as
+long as it runs on Linux.
+
+This approach a significant advantage: it is possible to lie about
+time to more than a one processes at the same time. It is especially
+useful for testing network applications where server and client run in
+different processess (and somewhat rely on time).
+
+Internally Fluxcapacitor relies on `ptrace` syscall and `LD_PRELOAD`
+linker feature, and thus is very Linux-specific.
+
 
 Basic examples
 ----
@@ -23,7 +31,7 @@ Basic examples
 First, compile:
 
     make
-    
+
 For example, these commands should finish instantly:
 
     ./fluxcapacitor --libpath=. -- sleep 1
