@@ -86,7 +86,7 @@ struct child {
 /* loader.c */
 void pin_cpu();
 char ***argv_split(char **argv, const char *delimiter, int upper_bound);
-int argv_join(char *dst, int dst_sz, char **argv, const char *delimiter);
+char *argv_join(char **argv, const char *delimiter);
 void ensure_libpath(const char *argv_0);
 void ldpreload_extend(const char *lib_path, const char *file);
 const char *ldpreload_get();

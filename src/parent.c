@@ -22,11 +22,11 @@ struct parent *parent_new() {
 }
 
 void parent_run_one(struct parent *parent, struct trace *trace,
-			     char **child_argv) {
+		    char **child_argv) {
 	int pid = trace_execvp(trace, child_argv);
-	char flat_argv[1024];
-	argv_join(flat_argv, sizeof(flat_argv), child_argv, " ");
+	char *flat_argv = argv_join(child_argv, " ");
 	SHOUT("[+] pid=%i running: %s", pid, flat_argv);
+	free(flat_argv);
 }
 
 struct child *parent_maybe_speedup(struct parent *parent) {

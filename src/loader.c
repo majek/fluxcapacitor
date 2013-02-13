@@ -66,19 +66,30 @@ char ***argv_split(char **argv, const char *delimiter, int upper_bound) {
 	return realloc(child_argv, child_no * sizeof(char *));
 }
 
-int argv_join(char *dst, int dst_sz, char **argv, const char *delimiter) {
-	if (argv[0]) {
-		int r = snprintf(dst, dst_sz, "%s%s", delimiter, argv[0]);
-		if (r < 0 || r >= dst_sz) {
-			return dst_sz - 1;
-		} else {
-			return r + argv_join(dst + r, dst_sz - r, &argv[1], delimiter);
+
+/* Returns malloced memory */
+char *argv_join(char **argv, const char *delimiter) {
+	int sz = 1024, pos = 0, delimiter_len = strlen(delimiter);
+	char **a;
+	char *b = malloc(sz);
+
+	for (a = argv; *a; a++) {
+		int a_len = strlen(*a);
+		while (sz < pos + a_len + delimiter_len) {
+			sz *= 2;
+			b = realloc(b, sz);
 		}
-	} else {
-		if (dst_sz > 0)
-			dst[0] = '\0';
-		return 0;
+		memcpy(&b[pos], *a, a_len);
+		memcpy(&b[pos+a_len], delimiter, delimiter_len);
+		pos += a_len + delimiter_len;
 	}
+	if (pos) {
+		/* Trim the trailing delimiter */
+		pos -= delimiter_len;
+	}
+	b = realloc(b, pos+1);
+	b[pos] = '\0';
+	return b;
 }
 
 #define PATH_DELIMITER "/"
