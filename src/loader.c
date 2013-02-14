@@ -68,28 +68,21 @@ char ***argv_split(char **argv, const char *delimiter, int upper_bound) {
 
 
 /* Returns malloced memory */
-char *argv_join(char **argv, const char *delimiter) {
-	int sz = 1024, pos = 0, delimiter_len = strlen(delimiter);
+char *argv_join(char **argv, const char *delim) {
+	int len = 0, delim_len = strlen(delim);
 	char **a;
-	char *b = malloc(sz);
-
 	for (a = argv; *a; a++) {
-		int a_len = strlen(*a);
-		while (sz < pos + a_len + delimiter_len) {
-			sz *= 2;
-			b = realloc(b, sz);
-		}
-		memcpy(&b[pos], *a, a_len);
-		memcpy(&b[pos+a_len], delimiter, delimiter_len);
-		pos += a_len + delimiter_len;
+		len += strlen(*a) + delim_len;
 	}
-	if (pos) {
-		/* Trim the trailing delimiter */
-		pos -= delimiter_len;
+	if (len) len -= delim_len;
+	char *s = malloc(len + 1), *p = s;
+	for (a = argv; *a; a++) {
+		if (a != argv)
+			p = stpcpy(p, delim);
+		p = stpcpy(p, *a);
 	}
-	b = realloc(b, pos+1);
-	b[pos] = '\0';
-	return b;
+	*p = '\0';
+	return s;
 }
 
 #define PATH_DELIMITER "/"
