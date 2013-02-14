@@ -87,7 +87,7 @@ int ftime(struct timeb *tp) {
 
 PUBLIC
 int nanosleep(const struct timespec *req, struct timespec *rem) {
-	return clock_nanosleep(CLOCK_REALTIME, 0, req, rem);
+	return libc_nanosleep(req, rem);
 }
 
 PUBLIC

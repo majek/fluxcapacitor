@@ -48,9 +48,8 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 		FATAL("clock_nanosleep() unsupported");
 
 	case SYS_nanosleep:
-		if (sysarg->arg2) {
-			FATAL("second parameter to nanosleep() unsupported");
-		}
+		/* Second argument to nanosleep() can be ignored, it's
+		   only supposed to be set on EINTR. */
 		type = TYPE_TIMESPEC; value = sysarg->arg1;
 		break;
 
@@ -120,7 +119,8 @@ int wrapper_syscall_exit(struct child *child, struct trace_sysarg *sysarg) {
 			clock_gettime(CLOCK_REALTIME, &ts);
 			u64 newtime = TIMESPEC_NSEC(&ts) + child->parent->time_drift;
 			ts = NSEC_TIMESPEC(newtime);
-			copy_to_user(child->process, sysarg->arg2, &ts, sizeof(struct timespec));
+			copy_to_user(child->process, sysarg->arg2, &ts,
+				     sizeof(struct timespec));
 		}
 		break;}
 
@@ -147,6 +147,9 @@ void wrapper_pacify_signal(struct child *child, struct trace_sysarg *sysarg) {
 		}
 	case SYS_pselect6:
 	case SYS_poll:
+		if (-516 == sysarg->ret) {
+			sysarg->ret = 0;
+		}
 	case SYS_ppoll:
 	case SYS_futex:		/* should be ETIMEOUT */
 		if (sysarg->ret != 0) {
