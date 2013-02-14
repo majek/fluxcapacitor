@@ -8,6 +8,10 @@ class SingleProcess(tests.TestCase):
         self.system("sleep 10")
 
     @at_most(seconds=0.5)
+    def test_bash_bash_sleep(self):
+        self.system("bash -c 'sleep 120;'")
+
+    @at_most(seconds=0.5)
     def test_python_select(self):
         self.system('python -c "import select; select.select([],[],[], 10)"')
 
@@ -47,6 +51,7 @@ int main() {
 ''')
     def test_nanosleep(self, compiled=None):
         self.system(compiled)
+
 
 
 

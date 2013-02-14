@@ -51,16 +51,23 @@ while:
     $ time ./fluxcapacitor --libpath=. -- sleep 12
     real    0m0.057s
 
-Another example:
+Another example, take a look at this session:
 
-    ./fluxcapacitor --libpath=. -- bash -c "date; sleep 120; date"
+    $ date
+    Thu Feb 14 23:49:55 GMT 2013
+    $ ./fluxcapacitor --libpath=. -- bash -c "date; sleep 120; date"
+    Thu Feb 14 23:49:57 GMT 2013
+    Thu Feb 14 23:51:57 GMT 2013
+    $ date
+    Thu Feb 14 23:49:58 GMT 2013
+
 
 You should see a program thinks time had passed, although it did not
 in reality.
 
 `Fluxcapacitor` works with any programming language:
 
-    ./fluxcapacitor --libpath=. -- python -c "import time; time.sleep(1000)"
+    $ ./fluxcapacitor --libpath=. -- python -c "import time; time.sleep(1000)"
 
 
 How does it work
@@ -137,8 +144,6 @@ else:
     os.system("python tests.py")
     os.kill(server_pid, signal.SIGINT)
 ```
-
-
 
 Development
 ====
