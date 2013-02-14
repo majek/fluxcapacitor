@@ -1,28 +1,27 @@
 Fluxcapacitor
 ----
 
-Fluxcapacitor is a tool for Linux, created to speed up tests.
+Fluxcapacitor is a tool for Linux created to speed up tests by lying
+about time.
 
-It is somewhat similar to tools like:
+It is somewhat similar to things like:
 
  * [FreezeGun](http://stevepulec.com/freezegun/) for Python
- * [timecop](https://github.com/travisjeffery/timecop) or
-   [Delorean](https://github.com/bebanjo/delorean) for Ruby
+ * [TimeCop](https://github.com/travisjeffery/timecop) or
+   [DeLorean](https://github.com/bebanjo/delorean) for Ruby
 
-These tools patch/mock time libraries in a programming
-language.
+While these tools patch time libraries in Ruby and Python,
+`fluxcapacitor` works on a lower layer and "patches" low-level
+syscalls. That way it can lie about time to any program in any
+programming language, as long as it runs on Linux.
 
-Fluxcapacitor on the other hand "patches" low-level syscalls. That way
-it can lie about time to any program in any programming language, as
-long as it runs on Linux.
-
-This approach a significant advantage: it is possible to lie about
+This approach has a significant advantage: it is possible to lie about
 time to more than a one processes at the same time. It is especially
 useful for testing network applications where server and client run in
-different processess (and somewhat rely on time).
+different processess and somewhat rely on time.
 
 Internally Fluxcapacitor relies on `ptrace` syscall and `LD_PRELOAD`
-linker feature, and thus is very Linux-specific.
+linker feature and thus is Linux-specific.
 
 
 Basic examples
@@ -30,11 +29,37 @@ Basic examples
 
 First, compile:
 
-    make
+    $ make
 
-For example, these commands should finish instantly:
+When you run `sleep` bash command, well, it will block the console for
+a given time. For example:
 
-    ./fluxcapacitor --libpath=. -- sleep 1
+    $ sleep 12
+
+will halt terminal for 12 seconds. When you run it with
+`fluxcapacitor`:
+
+    $ ./fluxcapacitor --libpath=. -- sleep 12
+
+it will finish instantly. Cool, ha? To illustrate this:
+
+    $ time sleep 12
+    real    0m12.003s
+
+while:
+
+    $ time ./fluxcapacitor --libpath=. -- sleep 12
+    real    0m0.057s
+
+Another example:
+
+    ./fluxcapacitor --libpath=. -- bash -c "date; sleep 120; date"
+
+You should see a program thinks time had passed, although it did not
+in reality.
+
+`Fluxcapacitor` works with any programming language:
+
     ./fluxcapacitor --libpath=. -- python -c "import time; time.sleep(1000)"
 
 
@@ -43,22 +68,22 @@ How does it work
 
 Fluxcapacitor does two things:
 
-1) It forces `fluxcapacitor_preload.so` to be preloaded for the
-executed command. This library is responsible for two things:
-   - It makes sure that `clock_gettime` will not be used by fast VDSO
-     mechanism, but by the standard system call. (that gives us the
-     opportunity to replace the return value of the system call
-     later).
-   - It replaces various time-related libc functions, like `time()`
-     and `gettimeofday()` with replacements using `clock_gettime`
-     underneath.
+1) It forces `fluxcapacitor_preload.so` to be preloaded using the
+LD_PRELOAD linux facility. This library is responsible for two things:
 
-2) It runs the command (and its forked children) in a `ptrace()`
-sandbox, capturing all the syscalls. Some syscalls - notably
+   - It makes sure that `clock_gettime` will not use fast VDSO
+     mechanism, but the standard system call. That gives us the
+     opportunity to replace the return value of the system call later.
+   - It replaces various time-related libc functions, like `time()`
+     and `gettimeofday()` with variants using `clock_gettime`
+     underneath. That simplifies syscall semantics thus making some
+     parts of the code less involved.
+
+2) It runs given command, and its forked children, in a `ptrace()`
+sandbox capturing all the syscalls. Some syscalls - notably
 `clock_gettime` will have original results overwritten by faked
 values. Other syscalls, like `select()`, `poll()` and `epoll_wait()`
-can be interrupted and its return value (`-EINTR`) will be rewritten
-to suggest reaching a timeout.
+can be interrupted and the result will be set to look like a timeout.
 
 
 When it won't work
@@ -67,16 +92,52 @@ When it won't work
 Fluxcapacitor won't work in a number of cases:
 
 1) If your code is statically compiled and `fluxcapacitor_preload.so`
-can't play its role.
+ld-preloaded library can't play its role.
 
-2) If your code uses non file descriptors event loops, like:
-`signalfd()`, `sigwait()`, `wait()`, etc. Or if your program relies
-heavily on signals and things like `alert()`, `setitimer()` or
-`timerfd_create()`.
+2) If your code uses unpopular functions in the event loop, like:
+`signalfd()`, `sigwait()`, `wait()`, `waitpid()`, etc. Or if your
+program relies heavily on signals and things like `alert()`,
+`setitimer()` or `timerfd_create()`.
 
 Basically, for Fluxcapacitor to work all the time queries need to be
 done using `gettimeofday()` or `clock_gettime()` and all the waiting
-for timeouts must rely on `select()`, `poll()` or `epoll_wait()`.
+for timeouts must rely on `select()`, `poll()` or
+`epoll_wait()`. Fortunately that's the case in most programming
+languages.
+
+
+Advanced usage
+----
+
+Say you have a delayed-echo server and you want to test it. It echos
+messages, just delayed by a few seconds. You don't want your tests to
+take too long. For example the code:
+
+ - [server.py](https://github.com/majek/fluxcapacitor/blob/master/examples/slowecho/server.py)
+ - [tests.py](https://github.com/majek/fluxcapacitor/blob/master/examples/slowecho/tests.py)
+
+Normally you could run the server, run the tests in a separate console
+and wait for some time. With `fluxcapacitor` you write a
+[wrapper program](https://github.com/majek/fluxcapacitor/blob/master/examples/slowecho/wrapper.py):
+
+
+```python
+#!/usr/bin/env python
+
+import os
+import time
+import signal
+
+server_pid = os.fork()
+if server_pid == 0:
+    os.execv("/usr/bin/python", ["python", "server.py"])
+    os._exit(0)
+else:
+    time.sleep(1)
+    os.system("python tests.py")
+    os.kill(server_pid, signal.SIGINT)
+```
+
 
 
 Development
@@ -86,7 +147,7 @@ Building
 ----
 
 To compile `fluxcapacitor` you need a reasonably recent linux
-distribution. To build type:
+distribution. Type:
 
     make build
 
