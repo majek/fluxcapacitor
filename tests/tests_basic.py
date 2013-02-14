@@ -4,32 +4,31 @@ import subprocess
 
 class SingleProcess(tests.TestCase):
     @at_most(seconds=0.5)
-    def test_sleep(self):
-        self.system("sleep 1")
+    def test_bash_sleep(self):
+        self.system("sleep 10")
 
     @at_most(seconds=0.5)
     def test_python_select(self):
-        self.system('python -c "import select; select.select([],[],[], 1)"')
+        self.system('python -c "import select; select.select([],[],[], 10)"')
 
     @at_most(seconds=0.5)
     def test_python_poll(self):
-        self.system('python -c "import select; select.poll().poll(1000)"')
+        self.system('python -c "import select; select.poll().poll(10000)"')
 
     @at_most(seconds=0.5)
     def test_python_epoll(self):
-        self.system('python -c "import select; select.epoll().poll(1000)"')
+        self.system('python -c "import select; select.epoll().poll(10000)"')
 
     @at_most(seconds=0.5)
     def test_node_epoll(self):
-        self.system('node -e "setTimeout(function(){},1000);"')
+        self.system('node -e "setTimeout(function(){},10000);"')
 
 
     @at_most(seconds=0.5)
     @compile(code='''
 #include <unistd.h>
-
 int main() {
-    sleep(1);
+    sleep(10);
     return(0);
 }
 ''')
@@ -40,7 +39,6 @@ int main() {
     @at_most(seconds=0.5)
     @compile(code='''
 #include <time.h>
-
 int main() {
     struct timespec ts = {1, 0};
     nanosleep(&ts, NULL);
