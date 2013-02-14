@@ -9,16 +9,22 @@ TESTLIB_FILES=src/testlib.c
 LIB_FILES=src/preload.c
 LOADER_FILES=src/wrapper.c src/parent.c src/loader.c src/uevent.c src/trace.c src/main.c
 
-all: $(TESTLIBNAME) $(LIBNAME) $(LOADERNAME) test
+all: build test
+
+.PHONY: build
+build: $(TESTLIBNAME) $(LIBNAME) $(LOADERNAME)
 
 $(TESTLIBNAME): Makefile $(TESTLIB_FILES)
-	gcc $(COPTS) $(TESTLIB_FILES)       -fPIC -shared -Wl,-soname,$(TESTLIBNAME) -o $(TESTLIBNAME)
+	gcc $(COPTS) $(TESTLIB_FILES)	\
+		-fPIC -shared -Wl,-soname,$(TESTLIBNAME) -o $(TESTLIBNAME)
 
 $(LIBNAME): Makefile $(LIB_FILES)
-	gcc $(COPTS) $(LIB_FILES) $(LDOPTS) -fPIC -shared -Wl,-soname,$(LIBNAME) -o $(LIBNAME)
+	gcc $(COPTS) $(LIB_FILES) $(LDOPTS) \
+		-fPIC -shared -Wl,-soname,$(LIBNAME) -o $(LIBNAME)
 
 $(LOADERNAME): Makefile $(LOADER_FILES)
-	gcc $(COPTS) $(LOADER_FILES) $(LDOPTS) -o $(LOADERNAME)
+	gcc $(COPTS) $(LOADER_FILES) $(LDOPTS) \
+		-o $(LOADERNAME)
 
 
 .PHONY:test
