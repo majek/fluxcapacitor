@@ -79,3 +79,32 @@ done using `gettimeofday()` or `clock_gettime()` and all the waiting
 for timeouts must rely on `select()`, `poll()` or `epoll_wait()`.
 
 
+Development
+====
+
+Building
+----
+
+To compile `fluxcapacitor` you need a reasonably recent linux
+distribution. To build type:
+
+    make build
+
+Testing
+----
+
+`Fluxcapacitor` comes with a number of python tests. See `tests`
+subdirectory for details. To test `fluxcapacitor` type:
+
+    make test
+
+or just:
+
+    make
+
+You can also run specific tests, but that's a bit more complex. For
+example to run `SingleProcess.test_sleep` from `tests/tests_basic.py`:
+
+    FCPATH="$PWD/fluxcapacitor --libpath=$PWD" \
+        python tests/tests_basic.py SingleProcess.test_sleep
+
