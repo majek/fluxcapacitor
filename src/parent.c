@@ -39,14 +39,12 @@ struct child *parent_maybe_speedup(struct parent *parent) {
 	list_for_each(pos, &parent->list_of_childs) {
 		struct child *child = hlist_entry(pos, struct child, in_childs);
 		if (child->blocked_timeout != TIMEOUT_UNKNOWN) {
-//			fprintf(stderr, " >%i< -> %lluns\n", child->pid, child->blocked_timeout);
 			if (!min_child ||
 			    min_child->blocked_timeout > child->blocked_timeout) {
 				min_child = child;
 			}
 		}
 	}
-//	fprintf(stderr, "total=%lli\n", min_timeout);
 	if (!min_child ||
 	    min_child->blocked_timeout <= 0 ||
 	    min_child->blocked_timeout >= TIMEOUT_FOREVER) {
@@ -81,7 +79,7 @@ struct child *child_new(struct parent *parent, struct trace_process *process, in
 }
 
 void child_del(struct child *child) {
-	if (child->blocked) 
+	if (child->blocked)
 		child_mark_unblocked(child);
 	list_del(&child->in_childs);
 	child->pid = 0;
@@ -93,7 +91,7 @@ void child_del(struct child *child) {
 void child_mark_blocked(struct child *child) {
 	if (child->blocked)
 		FATAL("");
-	
+
 	child->blocked = 1;
 	child->blocked_timeout = TIMEOUT_UNKNOWN;
 	list_add(&child->in_blocked, &child->parent->list_of_blocked);

@@ -131,7 +131,7 @@ static void __attribute__ ((constructor)) my_init(void)  {
         if (!libc_handle) {
 		FATAL("[-] dlopen(): %s", dlerror());
         }
-	
+
 	char *error;
 
 	libc_gettimeofday = dlsym(libc_handle, "gettimeofday");

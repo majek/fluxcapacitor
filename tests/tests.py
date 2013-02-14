@@ -5,13 +5,6 @@ import os
 import subprocess
 import tempfile
 
-# import inspect
-# def run_unittests(g):
-#     test_args = {'verbosity': 1}
-#     for t in [t for t in g.keys() if (inspect.isclass(g[t]) and issubclass(g[t], unittest.TestCase)) ]:
-#         suite = unittest.TestLoader().loadTestsFromTestCase(g[t])
-#         unittest.TextTestRunner(**test_args).run(suite)
-
 
 class TestCase(unittest.TestCase):
     def setUp(self):

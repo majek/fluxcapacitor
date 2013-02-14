@@ -59,12 +59,6 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 			type = TYPE_TIMESPEC; value = sysarg->arg4;
 		}
 		break;
-
-	/* case SYS_waitpid: */
-	/* 	if (!(sysarg->arg3 & WNOHANG)) { */
-	/* 		type = TYPE_FOREVER; */
-	/* 	} */
-	/* 	break; */
 	}
 
 	s64 timeout = TIMEOUT_UNKNOWN;
@@ -161,13 +155,6 @@ void wrapper_pacify_signal(struct child *child, struct trace_sysarg *sysarg) {
 				sysarg->ret);
 			return;
 		}
-		break;
-		/* if (sysarg->ret+512 == -EINTR) { */
-		/* 	fprintf(stderr, "faked resp\n"); */
-		/* 	sysarg->ret = -512-ETIMEDOUT; */
-		/* } */
-		/* TODO */
-		return;
 		break;
 	default:
 		return;
