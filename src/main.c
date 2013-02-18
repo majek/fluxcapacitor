@@ -27,7 +27,7 @@ static void usage() {
 "                       syscall instead of SIGURG.\n"
 "  --idleness=TIMEOUT   Speed up time only when all processess were\n"
 "                       idle for more than TIMEOUT (50ms by default).\n"
-"  --quiet,-q           Do not print the introductory messages.\n"
+"  --verbose,-v         Print more stuff.\n"
 "  --help               Print this message.\n"
 "\n"
 		);
@@ -44,6 +44,7 @@ static void main_loop(char ***list_of_argv);
 
 int main(int argc, char **argv) {
 
+	options.quiet = 1;
 	options.shoutstream = stderr;
 	options.signo = SIGURG;
 	options.idleness_threshold = 50 * 1000000ULL; /* 50ms */
@@ -57,13 +58,13 @@ int main(int argc, char **argv) {
 		static struct option long_options[] = {
 			{"libpath",  required_argument, 0,  0  },
 			{"help",     no_argument,       0, 'h' },
-			{"quiet",    no_argument,       0, 'q' },
+			{"verbose",  no_argument,       0, 'v' },
 			{"signal",   required_argument, 0,  0  },
 			{"idleness", required_argument, 0,  0  },
 			{0,          0,                 0,  0  }
 		};
 
-		int arg = getopt_long(argc, argv, "qh",
+		int arg = getopt_long(argc, argv, "vh",
 				      long_options, &option_index);
 		if (arg == -1) {
 			break;
@@ -87,8 +88,8 @@ int main(int argc, char **argv) {
 			}
 			break; }
 
-		case 'q':
-			options.quiet = 1;
+		case 'v':
+			options.quiet = 0;
 			break;
 
 		case 'h':
