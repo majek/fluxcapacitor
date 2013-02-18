@@ -77,16 +77,17 @@ Fluxcapacitor internally does two things:
    - It makes sure that `clock_gettime()` will use the standard
      syscall, not the ultra-fast VDSO mechanism. That gives us the
      opportunity to replace the return value of the system call later.
-   - It replaces various time-related libc functions, like `time()`
-     and `gettimeofday()` with variants using `clock_gettime()`
-     underneath. That simplifies syscall semantics thus making some
-     parts of the code less involved.
+   - It replaces various time-related libc functions: `clock_gettime()`,
+     `gettimeofday()`, `time()`, `ftime()`, `nanosleep()` and `clock_nanosleep()`
+     with variants using modified `clock_gettime()`. That simplifies syscall
+     semantics thus making some parts of the server code less involved.
 
 2) It runs given command, and its forked children, in a `ptrace()`
 sandbox capturing all the syscalls. Some syscalls - notably
-`clock_gettime` will have original results overwritten by faked
-values. Other syscalls, like `select()`, `poll()` and `epoll_wait()`
-can be interrupted and the result will be set to look like a timeout.
+`clock_gettime` have original results returned by kernel overwritten
+by faked values. Other syscalls, like `select()`, `poll()` and
+`epoll_wait()` can be interrupted (by a signal) and the result will be
+set to look like a timeout had expired.
 
 
 When it won't work
@@ -101,6 +102,9 @@ ld-preloaded library can't play its role.
 `signalfd()`, `sigwait()`, `wait()`, `waitpid()`, etc. Or if your
 program relies heavily on signals and things like `alert()`,
 `setitimer()` or `timerfd_create()`.
+
+3) If your code uses file access or modification
+timestamps. `Fluxcapacitor` does not mock that.
 
 Basically, for Fluxcapacitor to work all the time queries need to be
 done using `gettimeofday()` or `clock_gettime()` and all the waiting
