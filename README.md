@@ -145,6 +145,18 @@ else:
     os.kill(server_pid, signal.SIGINT)
 ```
 
+This script just runs the tests in an automated manner. Without our
+tool the test take 1 second each:
+
+    $ time python wrapper.py
+    real    0m5.112s
+
+With `fluxcapacitor` it's much faster:
+
+    $ ./fluxcapacitor --libpath=. -- python wrapper.py
+    real    0m0.355s
+
+
 Development
 ====
 
