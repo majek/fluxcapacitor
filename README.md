@@ -1,8 +1,7 @@
 Fluxcapacitor
 ----
 
-Fluxcapacitor is a tool for Linux created to speed up tests by lying
-about time.
+`Fluxcapacitor` is a tool for spoofing POSIX time functions.
 
 It is somewhat similar to things like:
 
@@ -17,11 +16,11 @@ programming language, as long as it runs on Linux.
 
 This approach has a significant advantage: it is possible to lie about
 time to more than a one processes at the same time. It is especially
-useful for testing network applications where server and client run in
-different processess and somewhat rely on time.
+useful for running network applications where server and client run in
+different processes and somewhat rely on time.
 
 Internally Fluxcapacitor uses on `ptrace` syscall and `LD_PRELOAD`
-linker feature and thus is Linux-specific.
+linker feature and thus is Linux specific.
 
 
 Basic examples
@@ -116,7 +115,9 @@ languages.
 Advanced usage
 ----
 
-Say you have a delayed-echo server and you want to test it. It echos
+`Fluxcapacitor` main application is speeding up tests.
+
+Say you have a "delayed echo" server and you want to test it. It echos
 messages, just delayed by a few seconds. You don't want your tests to
 take too long. For example the code:
 
