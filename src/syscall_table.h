@@ -1,16 +1,6 @@
 #include <linux/futex.h>
 #include <sys/syscall.h>
 
-/* #if defined(__x86_64__) */
-/* #  include "vki-scnums-amd64-linux.h" */
-/* #elif defined(__i386__) */
-/* #  include "vki-scnums-x86-linux.h" */
-/* #elif defined(__ARMEL__) */
-/* #  include "vki-scnums-arm-linux.h" */
-/* #else */
-/* #  error "Unknown architecture!" */
-/* #endif */
-
 static char *syscall_table[] = {
 	[SYS_restart_syscall] = "restart_syscall",
 	[SYS_exit] = "exit",

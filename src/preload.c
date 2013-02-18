@@ -12,7 +12,7 @@
 
 #include "types.h"
 
-static int  (*libc_gettimeofday)(struct timeval *tv, struct timezone *tz);
+static int (*libc_gettimeofday)(struct timeval *tv, struct timezone *tz);
 static int (*libc_ftime)(struct timeb *tp);
 static int (*libc_nanosleep)(const struct timespec *req, struct timespec *rem);
 
