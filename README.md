@@ -60,7 +60,17 @@ Another example, take a look at this session:
 You should see a program thinks time had passed, although it did not
 in reality.
 
-`Fluxcapacitor` works with any programming language:
+Ever heard of the
+[year 2038 problem](https://en.wikipedia.org/wiki/Year_2038_problem)?
+Here's how it's going to look like in action:
+
+    $ ./fluxcapacitor --libpath=. -- bash -c "sleep 700000000; date"
+    Thu Apr 26 17:44:25 BST 2035
+    $ ./fluxcapacitor --libpath=. -- bash -c "sleep 800000000; date"
+    Wed May 21 20:04:03 GMT 1902
+
+
+Finally, `fluxcapacitor` works with any programming language:
 
     $ ./fluxcapacitor --libpath=. -- python -c "import time; time.sleep(1000)"
 
