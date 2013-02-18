@@ -20,16 +20,12 @@ time to more than a one processes at the same time. It is especially
 useful for testing network applications where server and client run in
 different processess and somewhat rely on time.
 
-Internally Fluxcapacitor relies on `ptrace` syscall and `LD_PRELOAD`
+Internally Fluxcapacitor uses on `ptrace` syscall and `LD_PRELOAD`
 linker feature and thus is Linux-specific.
 
 
 Basic examples
 ----
-
-First, compile:
-
-    $ make
 
 When you run `sleep` bash command, well, it will block the console for
 a given time. For example:
@@ -73,16 +69,16 @@ in reality.
 How does it work
 ----
 
-Fluxcapacitor does two things:
+Fluxcapacitor internally does two things:
 
 1) It forces `fluxcapacitor_preload.so` to be preloaded using the
-LD_PRELOAD linux facility. This library is responsible for two things:
+`LD_PRELOAD` linux facility. This library is responsible for two things:
 
-   - It makes sure that `clock_gettime` will not use fast VDSO
-     mechanism, but the standard system call. That gives us the
+   - It makes sure that `clock_gettime()` will use the standard
+     syscall, not the ultra-fast VDSO mechanism. That gives us the
      opportunity to replace the return value of the system call later.
    - It replaces various time-related libc functions, like `time()`
-     and `gettimeofday()` with variants using `clock_gettime`
+     and `gettimeofday()` with variants using `clock_gettime()`
      underneath. That simplifies syscall semantics thus making some
      parts of the code less involved.
 
@@ -125,7 +121,7 @@ take too long. For example the code:
 
 Normally you could run the server, run the tests in a separate console
 and wait for some time. With `fluxcapacitor` you write a
-[wrapper program](https://github.com/majek/fluxcapacitor/blob/master/examples/slowecho/wrapper.py):
+[wrapper program](https://github.com/majek/fluxcapacitor/blob/master/examples/slowecho/run_test.py):
 
 
 ```python
@@ -145,15 +141,15 @@ else:
     os.kill(server_pid, signal.SIGINT)
 ```
 
-This script just runs the tests in an automated manner. Without our
-tool the test take 1 second each:
+This script just runs the tests in an automated manner. Normally the
+tests take 1 second each:
 
-    $ time python wrapper.py
+    $ time python run_test.py
     real    0m5.112s
 
 With `fluxcapacitor` it's much faster:
 
-    $ ./fluxcapacitor --libpath=. -- python wrapper.py
+    $ ./fluxcapacitor --libpath=. -- python run_test.py
     real    0m0.355s
 
 
