@@ -1,16 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-
-#include <linux/futex.h>
-#include <sys/syscall.h>
 #include <errno.h>
 #include <time.h>
+
+#include <linux/futex.h>
 
 #include "list.h"
 #include "types.h"
 #include "trace.h"
 #include "fluxcapacitor.h"
+#include "scnums.h"
 
 
 enum {
@@ -30,30 +30,32 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 	int value = 0;
 
 	switch ((unsigned short)sysarg->number) {
-	case SYS_epoll_wait:
-	case SYS_epoll_pwait:
+	case __NR_epoll_wait:
+	case __NR_epoll_pwait:
 		type = TYPE_MSEC;value = sysarg->arg4; break;
 
-	case SYS__newselect:
+#ifdef __NR__newselect
+	case __NR__newselect:
 		type = TYPE_TIMEVAL; value = sysarg->arg5; break;
-	case SYS_pselect6:
+#endif
+	case __NR_pselect6:
 		type = TYPE_TIMESPEC; value = sysarg->arg5; break;
 
-	case SYS_poll:
+	case __NR_poll:
 		type = TYPE_MSEC; value = sysarg->arg3; break;
-	case SYS_ppoll:
+	case __NR_ppoll:
 		type = TYPE_TIMESPEC; value = sysarg->arg3; break;
 
-	case SYS_clock_nanosleep:
+	case __NR_clock_nanosleep:
 		FATAL("clock_nanosleep() unsupported");
 
-	case SYS_nanosleep:
+	case __NR_nanosleep:
 		/* Second argument to nanosleep() can be ignored, it's
 		   only supposed to be set on EINTR. */
 		type = TYPE_TIMESPEC; value = sysarg->arg1;
 		break;
 
-	case SYS_futex:
+	case __NR_futex:
 		if (sysarg->arg2 == FUTEX_WAIT || sysarg->arg2 == FUTEX_WAIT_PRIVATE) {
 			type = TYPE_TIMESPEC; value = sysarg->arg4;
 		}
@@ -111,7 +113,7 @@ int wrapper_syscall_exit(struct child *child, struct trace_sysarg *sysarg) {
 
 	switch (sysarg->number) {
 
-	case SYS_clock_gettime:{
+	case __NR_clock_gettime:{
 		if (sysarg->ret == 0) {
 			if (sysarg->arg1 != CLOCK_REALTIME && sysarg->arg1 != CLOCK_MONOTONIC)
 				FATAL("%li ", sysarg->arg1);
@@ -135,23 +137,25 @@ int wrapper_syscall_exit(struct child *child, struct trace_sysarg *sysarg) {
  * to a result that will read: "timeout". */
 void wrapper_pacify_signal(struct child *child, struct trace_sysarg *sysarg) {
 	switch (sysarg->number) {
-	case SYS_epoll_wait:
-	case SYS_epoll_pwait:
+	case __NR_epoll_wait:
+	case __NR_epoll_pwait:
 		if (sysarg->ret == -EINTR) {
 			sysarg->ret = 0;
 		}
-	case SYS__newselect:
-	case SYS_nanosleep:
+#ifdef __NR__newselect
+	case __NR__newselect:
+#endif
+	case __NR_nanosleep:
 		if (-512 >= sysarg->ret && sysarg->ret >= -517) { // ERESTART_RESTARTBLOCK
 			sysarg->ret = 0;
 		}
-	case SYS_pselect6:
-	case SYS_poll:
+	case __NR_pselect6:
+	case __NR_poll:
 		if (-516 == sysarg->ret) {
 			sysarg->ret = 0;
 		}
-	case SYS_ppoll:
-	case SYS_futex:		/* should be ETIMEOUT */
+	case __NR_ppoll:
+	case __NR_futex:		/* should be ETIMEOUT */
 		if (sysarg->ret != 0) {
 			fprintf(stderr, "can't fake resp %s=%li\n",
 				syscall_to_str(sysarg->number),

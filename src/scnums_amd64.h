@@ -1,0 +1,681 @@
+#ifndef _SCNUMS_AMD64_H
+#define _SCNUMS_AMD64_H
+/*
+  Derived from kernel sycall_64.tbl
+
+  cat linux/arch/x86/syscalls/syscall_64.tbl|	\
+	egrep -v "^#"|	\
+	sed 's|^\([0-9]\+\)\s\+\w\+\s\+\(\w\+\).*$|#define __NR_\2\t\t\t\1|g' \
+	> scnums-amd64.h
+
+  cat linux/arch/x86/syscalls/syscall_64.tbl| \
+	egrep -v "^#"| \
+	sed 's|^\([0-9]\+\)\s\+\w\+\s\+\(\w\+\).*$|\t[__NR_\2] = "\2",|g' \
+	>> scnums-amd64.h
+ */
+
+#define __NR_read			0
+#define __NR_write			1
+#define __NR_open			2
+#define __NR_close			3
+#define __NR_stat			4
+#define __NR_fstat			5
+#define __NR_lstat			6
+#define __NR_poll			7
+#define __NR_lseek			8
+#define __NR_mmap			9
+#define __NR_mprotect			10
+#define __NR_munmap			11
+#define __NR_brk			12
+#define __NR_rt_sigaction		13
+#define __NR_rt_sigprocmask		14
+#define __NR_rt_sigreturn		15
+#define __NR_ioctl			16
+#define __NR_pread64			17
+#define __NR_pwrite64			18
+#define __NR_readv			19
+#define __NR_writev			20
+#define __NR_access			21
+#define __NR_pipe			22
+#define __NR_select			23
+#define __NR_sched_yield		24
+#define __NR_mremap			25
+#define __NR_msync			26
+#define __NR_mincore			27
+#define __NR_madvise			28
+#define __NR_shmget			29
+#define __NR_shmat			30
+#define __NR_shmctl			31
+#define __NR_dup			32
+#define __NR_dup2			33
+#define __NR_pause			34
+#define __NR_nanosleep			35
+#define __NR_getitimer			36
+#define __NR_alarm			37
+#define __NR_setitimer			38
+#define __NR_getpid			39
+#define __NR_sendfile			40
+#define __NR_socket			41
+#define __NR_connect			42
+#define __NR_accept			43
+#define __NR_sendto			44
+#define __NR_recvfrom			45
+#define __NR_sendmsg			46
+#define __NR_recvmsg			47
+#define __NR_shutdown			48
+#define __NR_bind			49
+#define __NR_listen			50
+#define __NR_getsockname		51
+#define __NR_getpeername		52
+#define __NR_socketpair			53
+#define __NR_setsockopt			54
+#define __NR_getsockopt			55
+#define __NR_clone			56
+#define __NR_fork			57
+#define __NR_vfork			58
+#define __NR_execve			59
+#define __NR_exit			60
+#define __NR_wait4			61
+#define __NR_kill			62
+#define __NR_uname			63
+#define __NR_semget			64
+#define __NR_semop			65
+#define __NR_semctl			66
+#define __NR_shmdt			67
+#define __NR_msgget			68
+#define __NR_msgsnd			69
+#define __NR_msgrcv			70
+#define __NR_msgctl			71
+#define __NR_fcntl			72
+#define __NR_flock			73
+#define __NR_fsync			74
+#define __NR_fdatasync			75
+#define __NR_truncate			76
+#define __NR_ftruncate			77
+#define __NR_getdents			78
+#define __NR_getcwd			79
+#define __NR_chdir			80
+#define __NR_fchdir			81
+#define __NR_rename			82
+#define __NR_mkdir			83
+#define __NR_rmdir			84
+#define __NR_creat			85
+#define __NR_link			86
+#define __NR_unlink			87
+#define __NR_symlink			88
+#define __NR_readlink			89
+#define __NR_chmod			90
+#define __NR_fchmod			91
+#define __NR_chown			92
+#define __NR_fchown			93
+#define __NR_lchown			94
+#define __NR_umask			95
+#define __NR_gettimeofday	       	96
+#define __NR_getrlimit			97
+#define __NR_getrusage			98
+#define __NR_sysinfo			99
+#define __NR_times			100
+#define __NR_ptrace			101
+#define __NR_getuid			102
+#define __NR_syslog			103
+#define __NR_getgid			104
+#define __NR_setuid			105
+#define __NR_setgid			106
+#define __NR_geteuid			107
+#define __NR_getegid			108
+#define __NR_setpgid			109
+#define __NR_getppid			110
+#define __NR_getpgrp			111
+#define __NR_setsid			112
+#define __NR_setreuid			113
+#define __NR_setregid			114
+#define __NR_getgroups			115
+#define __NR_setgroups			116
+#define __NR_setresuid			117
+#define __NR_getresuid			118
+#define __NR_setresgid			119
+#define __NR_getresgid			120
+#define __NR_getpgid			121
+#define __NR_setfsuid			122
+#define __NR_setfsgid			123
+#define __NR_getsid			124
+#define __NR_capget			125
+#define __NR_capset			126
+#define __NR_rt_sigpending		127
+#define __NR_rt_sigtimedwait		128
+#define __NR_rt_sigqueueinfo		129
+#define __NR_rt_sigsuspend     		130
+#define __NR_sigaltstack		131
+#define __NR_utime			132
+#define __NR_mknod			133
+#define __NR_uselib			134
+#define __NR_personality		135
+#define __NR_ustat			136
+#define __NR_statfs			137
+#define __NR_fstatfs			138
+#define __NR_sysfs			139
+#define __NR_getpriority		140
+#define __NR_setpriority		141
+#define __NR_sched_setparam		142
+#define __NR_sched_getparam		143
+#define __NR_sched_setscheduler		144
+#define __NR_sched_getscheduler		145
+#define __NR_sched_get_priority_max	146
+#define __NR_sched_get_priority_min	147
+#define __NR_sched_rr_get_interval	148
+#define __NR_mlock			149
+#define __NR_munlock			150
+#define __NR_mlockall			151
+#define __NR_munlockall			152
+#define __NR_vhangup			153
+#define __NR_modify_ldt			154
+#define __NR_pivot_root			155
+#define __NR__sysctl			156
+#define __NR_prctl			157
+#define __NR_arch_prctl			158
+#define __NR_adjtimex			159
+#define __NR_setrlimit			160
+#define __NR_chroot			161
+#define __NR_sync			162
+#define __NR_acct			163
+#define __NR_settimeofday		164
+#define __NR_mount			165
+#define __NR_umount2			166
+#define __NR_swapon			167
+#define __NR_swapoff			168
+#define __NR_reboot			169
+#define __NR_sethostname		170
+#define __NR_setdomainname		171
+#define __NR_iopl			172
+#define __NR_ioperm			173
+#define __NR_create_module		174
+#define __NR_init_module		175
+#define __NR_delete_module		176
+#define __NR_get_kernel_syms		177
+#define __NR_query_module		178
+#define __NR_quotactl			179
+#define __NR_nfsservctl			180
+#define __NR_getpmsg			181
+#define __NR_putpmsg			182
+#define __NR_afs_syscall		183
+#define __NR_tuxcall			184
+#define __NR_security			185
+#define __NR_gettid			186
+#define __NR_readahead			187
+#define __NR_setxattr			188
+#define __NR_lsetxattr			189
+#define __NR_fsetxattr			190
+#define __NR_getxattr			191
+#define __NR_lgetxattr			192
+#define __NR_fgetxattr			193
+#define __NR_listxattr			194
+#define __NR_llistxattr			195
+#define __NR_flistxattr			196
+#define __NR_removexattr		197
+#define __NR_lremovexattr		198
+#define __NR_fremovexattr		199
+#define __NR_tkill			200
+#define __NR_time			201
+#define __NR_futex			202
+#define __NR_sched_setaffinity		203
+#define __NR_sched_getaffinity		204
+#define __NR_set_thread_area		205
+#define __NR_io_setup			206
+#define __NR_io_destroy			207
+#define __NR_io_getevents		208
+#define __NR_io_submit			209
+#define __NR_io_cancel			210
+#define __NR_get_thread_area		211
+#define __NR_lookup_dcookie		212
+#define __NR_epoll_create		213
+#define __NR_epoll_ctl_old		214
+#define __NR_epoll_wait_old		215
+#define __NR_remap_file_pages		216
+#define __NR_getdents64			217
+#define __NR_set_tid_address		218
+#define __NR_restart_syscall		219
+#define __NR_semtimedop			220
+#define __NR_fadvise64			221
+#define __NR_timer_create		222
+#define __NR_timer_settime		223
+#define __NR_timer_gettime		224
+#define __NR_timer_getoverrun		225
+#define __NR_timer_delete		226
+#define __NR_clock_settime		227
+#define __NR_clock_gettime		228
+#define __NR_clock_getres		229
+#define __NR_clock_nanosleep		230
+#define __NR_exit_group			231
+#define __NR_epoll_wait			232
+#define __NR_epoll_ctl			233
+#define __NR_tgkill			234
+#define __NR_utimes			235
+#define __NR_vserver			236
+#define __NR_mbind			237
+#define __NR_set_mempolicy		238
+#define __NR_get_mempolicy		239
+#define __NR_mq_open			240
+#define __NR_mq_unlink			241
+#define __NR_mq_timedsend		242
+#define __NR_mq_timedreceive		243
+#define __NR_mq_notify			244
+#define __NR_mq_getsetattr		245
+#define __NR_kexec_load			246
+#define __NR_waitid			247
+#define __NR_add_key			248
+#define __NR_request_key		249
+#define __NR_keyctl			250
+#define __NR_ioprio_set			251
+#define __NR_ioprio_get			252
+#define __NR_inotify_init		253
+#define __NR_inotify_add_watch		254
+#define __NR_inotify_rm_watch		255
+#define __NR_migrate_pages		256
+#define __NR_openat			257
+#define __NR_mkdirat			258
+#define __NR_mknodat			259
+#define __NR_fchownat			260
+#define __NR_futimesat			261
+#define __NR_newfstatat			262
+#define __NR_unlinkat			263
+#define __NR_renameat			264
+#define __NR_linkat			265
+#define __NR_symlinkat			266
+#define __NR_readlinkat			267
+#define __NR_fchmodat			268
+#define __NR_faccessat			269
+#define __NR_pselect6			270
+#define __NR_ppoll			271
+#define __NR_unshare			272
+#define __NR_set_robust_list		273
+#define __NR_get_robust_list		274
+#define __NR_splice			275
+#define __NR_tee			276
+#define __NR_sync_file_range		277
+#define __NR_vmsplice			278
+#define __NR_move_pages			279
+#define __NR_utimensat			280
+#define __NR_epoll_pwait		281
+#define __NR_signalfd			282
+#define __NR_timerfd_create		283
+#define __NR_eventfd			284
+#define __NR_fallocate			285
+#define __NR_timerfd_settime		286
+#define __NR_timerfd_gettime		287
+#define __NR_accept4			288
+#define __NR_signalfd4			289
+#define __NR_eventfd2			290
+#define __NR_epoll_create1     		291
+#define __NR_dup3			292
+#define __NR_pipe2			293
+#define __NR_inotify_init1		294
+#define __NR_preadv			295
+#define __NR_pwritev			296
+#define __NR_rt_tgsigqueueinfo		297
+#define __NR_perf_event_open		298
+#define __NR_recvmmsg			299
+#define __NR_fanotify_init		300
+#define __NR_fanotify_mark		301
+#define __NR_prlimit64			302
+#define __NR_name_to_handle_at		303
+#define __NR_open_by_handle_at		304
+#define __NR_clock_adjtime		305
+#define __NR_syncfs			306
+#define __NR_sendmmsg			307
+#define __NR_setns			308
+#define __NR_getcpu			309
+#define __NR_process_vm_readv		310
+#define __NR_process_vm_writev		311
+#define __NR_kcmp			312
+
+static const char *const syscall_to_str_map[] = {
+	[__NR_read] = "read",
+	[__NR_write] = "write",
+	[__NR_open] = "open",
+	[__NR_close] = "close",
+	[__NR_stat] = "stat",
+	[__NR_fstat] = "fstat",
+	[__NR_lstat] = "lstat",
+	[__NR_poll] = "poll",
+	[__NR_lseek] = "lseek",
+	[__NR_mmap] = "mmap",
+	[__NR_mprotect] = "mprotect",
+	[__NR_munmap] = "munmap",
+	[__NR_brk] = "brk",
+	[__NR_rt_sigaction] = "rt_sigaction",
+	[__NR_rt_sigprocmask] = "rt_sigprocmask",
+	[__NR_rt_sigreturn] = "rt_sigreturn",
+	[__NR_ioctl] = "ioctl",
+	[__NR_pread64] = "pread64",
+	[__NR_pwrite64] = "pwrite64",
+	[__NR_readv] = "readv",
+	[__NR_writev] = "writev",
+	[__NR_access] = "access",
+	[__NR_pipe] = "pipe",
+	[__NR_select] = "select",
+	[__NR_sched_yield] = "sched_yield",
+	[__NR_mremap] = "mremap",
+	[__NR_msync] = "msync",
+	[__NR_mincore] = "mincore",
+	[__NR_madvise] = "madvise",
+	[__NR_shmget] = "shmget",
+	[__NR_shmat] = "shmat",
+	[__NR_shmctl] = "shmctl",
+	[__NR_dup] = "dup",
+	[__NR_dup2] = "dup2",
+	[__NR_pause] = "pause",
+	[__NR_nanosleep] = "nanosleep",
+	[__NR_getitimer] = "getitimer",
+	[__NR_alarm] = "alarm",
+	[__NR_setitimer] = "setitimer",
+	[__NR_getpid] = "getpid",
+	[__NR_sendfile] = "sendfile",
+	[__NR_socket] = "socket",
+	[__NR_connect] = "connect",
+	[__NR_accept] = "accept",
+	[__NR_sendto] = "sendto",
+	[__NR_recvfrom] = "recvfrom",
+	[__NR_sendmsg] = "sendmsg",
+	[__NR_recvmsg] = "recvmsg",
+	[__NR_shutdown] = "shutdown",
+	[__NR_bind] = "bind",
+	[__NR_listen] = "listen",
+	[__NR_getsockname] = "getsockname",
+	[__NR_getpeername] = "getpeername",
+	[__NR_socketpair] = "socketpair",
+	[__NR_setsockopt] = "setsockopt",
+	[__NR_getsockopt] = "getsockopt",
+	[__NR_clone] = "clone",
+	[__NR_fork] = "fork",
+	[__NR_vfork] = "vfork",
+	[__NR_execve] = "execve",
+	[__NR_exit] = "exit",
+	[__NR_wait4] = "wait4",
+	[__NR_kill] = "kill",
+	[__NR_uname] = "uname",
+	[__NR_semget] = "semget",
+	[__NR_semop] = "semop",
+	[__NR_semctl] = "semctl",
+	[__NR_shmdt] = "shmdt",
+	[__NR_msgget] = "msgget",
+	[__NR_msgsnd] = "msgsnd",
+	[__NR_msgrcv] = "msgrcv",
+	[__NR_msgctl] = "msgctl",
+	[__NR_fcntl] = "fcntl",
+	[__NR_flock] = "flock",
+	[__NR_fsync] = "fsync",
+	[__NR_fdatasync] = "fdatasync",
+	[__NR_truncate] = "truncate",
+	[__NR_ftruncate] = "ftruncate",
+	[__NR_getdents] = "getdents",
+	[__NR_getcwd] = "getcwd",
+	[__NR_chdir] = "chdir",
+	[__NR_fchdir] = "fchdir",
+	[__NR_rename] = "rename",
+	[__NR_mkdir] = "mkdir",
+	[__NR_rmdir] = "rmdir",
+	[__NR_creat] = "creat",
+	[__NR_link] = "link",
+	[__NR_unlink] = "unlink",
+	[__NR_symlink] = "symlink",
+	[__NR_readlink] = "readlink",
+	[__NR_chmod] = "chmod",
+	[__NR_fchmod] = "fchmod",
+	[__NR_chown] = "chown",
+	[__NR_fchown] = "fchown",
+	[__NR_lchown] = "lchown",
+	[__NR_umask] = "umask",
+	[__NR_gettimeofday] = "gettimeofday",
+	[__NR_getrlimit] = "getrlimit",
+	[__NR_getrusage] = "getrusage",
+	[__NR_sysinfo] = "sysinfo",
+	[__NR_times] = "times",
+	[__NR_ptrace] = "ptrace",
+	[__NR_getuid] = "getuid",
+	[__NR_syslog] = "syslog",
+	[__NR_getgid] = "getgid",
+	[__NR_setuid] = "setuid",
+	[__NR_setgid] = "setgid",
+	[__NR_geteuid] = "geteuid",
+	[__NR_getegid] = "getegid",
+	[__NR_setpgid] = "setpgid",
+	[__NR_getppid] = "getppid",
+	[__NR_getpgrp] = "getpgrp",
+	[__NR_setsid] = "setsid",
+	[__NR_setreuid] = "setreuid",
+	[__NR_setregid] = "setregid",
+	[__NR_getgroups] = "getgroups",
+	[__NR_setgroups] = "setgroups",
+	[__NR_setresuid] = "setresuid",
+	[__NR_getresuid] = "getresuid",
+	[__NR_setresgid] = "setresgid",
+	[__NR_getresgid] = "getresgid",
+	[__NR_getpgid] = "getpgid",
+	[__NR_setfsuid] = "setfsuid",
+	[__NR_setfsgid] = "setfsgid",
+	[__NR_getsid] = "getsid",
+	[__NR_capget] = "capget",
+	[__NR_capset] = "capset",
+	[__NR_rt_sigpending] = "rt_sigpending",
+	[__NR_rt_sigtimedwait] = "rt_sigtimedwait",
+	[__NR_rt_sigqueueinfo] = "rt_sigqueueinfo",
+	[__NR_rt_sigsuspend] = "rt_sigsuspend",
+	[__NR_sigaltstack] = "sigaltstack",
+	[__NR_utime] = "utime",
+	[__NR_mknod] = "mknod",
+	[__NR_uselib] = "uselib",
+	[__NR_personality] = "personality",
+	[__NR_ustat] = "ustat",
+	[__NR_statfs] = "statfs",
+	[__NR_fstatfs] = "fstatfs",
+	[__NR_sysfs] = "sysfs",
+	[__NR_getpriority] = "getpriority",
+	[__NR_setpriority] = "setpriority",
+	[__NR_sched_setparam] = "sched_setparam",
+	[__NR_sched_getparam] = "sched_getparam",
+	[__NR_sched_setscheduler] = "sched_setscheduler",
+	[__NR_sched_getscheduler] = "sched_getscheduler",
+	[__NR_sched_get_priority_max] = "sched_get_priority_max",
+	[__NR_sched_get_priority_min] = "sched_get_priority_min",
+	[__NR_sched_rr_get_interval] = "sched_rr_get_interval",
+	[__NR_mlock] = "mlock",
+	[__NR_munlock] = "munlock",
+	[__NR_mlockall] = "mlockall",
+	[__NR_munlockall] = "munlockall",
+	[__NR_vhangup] = "vhangup",
+	[__NR_modify_ldt] = "modify_ldt",
+	[__NR_pivot_root] = "pivot_root",
+	[__NR__sysctl] = "_sysctl",
+	[__NR_prctl] = "prctl",
+	[__NR_arch_prctl] = "arch_prctl",
+	[__NR_adjtimex] = "adjtimex",
+	[__NR_setrlimit] = "setrlimit",
+	[__NR_chroot] = "chroot",
+	[__NR_sync] = "sync",
+	[__NR_acct] = "acct",
+	[__NR_settimeofday] = "settimeofday",
+	[__NR_mount] = "mount",
+	[__NR_umount2] = "umount2",
+	[__NR_swapon] = "swapon",
+	[__NR_swapoff] = "swapoff",
+	[__NR_reboot] = "reboot",
+	[__NR_sethostname] = "sethostname",
+	[__NR_setdomainname] = "setdomainname",
+	[__NR_iopl] = "iopl",
+	[__NR_ioperm] = "ioperm",
+	[__NR_create_module] = "create_module",
+	[__NR_init_module] = "init_module",
+	[__NR_delete_module] = "delete_module",
+	[__NR_get_kernel_syms] = "get_kernel_syms",
+	[__NR_query_module] = "query_module",
+	[__NR_quotactl] = "quotactl",
+	[__NR_nfsservctl] = "nfsservctl",
+	[__NR_getpmsg] = "getpmsg",
+	[__NR_putpmsg] = "putpmsg",
+	[__NR_afs_syscall] = "afs_syscall",
+	[__NR_tuxcall] = "tuxcall",
+	[__NR_security] = "security",
+	[__NR_gettid] = "gettid",
+	[__NR_readahead] = "readahead",
+	[__NR_setxattr] = "setxattr",
+	[__NR_lsetxattr] = "lsetxattr",
+	[__NR_fsetxattr] = "fsetxattr",
+	[__NR_getxattr] = "getxattr",
+	[__NR_lgetxattr] = "lgetxattr",
+	[__NR_fgetxattr] = "fgetxattr",
+	[__NR_listxattr] = "listxattr",
+	[__NR_llistxattr] = "llistxattr",
+	[__NR_flistxattr] = "flistxattr",
+	[__NR_removexattr] = "removexattr",
+	[__NR_lremovexattr] = "lremovexattr",
+	[__NR_fremovexattr] = "fremovexattr",
+	[__NR_tkill] = "tkill",
+	[__NR_time] = "time",
+	[__NR_futex] = "futex",
+	[__NR_sched_setaffinity] = "sched_setaffinity",
+	[__NR_sched_getaffinity] = "sched_getaffinity",
+	[__NR_set_thread_area] = "set_thread_area",
+	[__NR_io_setup] = "io_setup",
+	[__NR_io_destroy] = "io_destroy",
+	[__NR_io_getevents] = "io_getevents",
+	[__NR_io_submit] = "io_submit",
+	[__NR_io_cancel] = "io_cancel",
+	[__NR_get_thread_area] = "get_thread_area",
+	[__NR_lookup_dcookie] = "lookup_dcookie",
+	[__NR_epoll_create] = "epoll_create",
+	[__NR_epoll_ctl_old] = "epoll_ctl_old",
+	[__NR_epoll_wait_old] = "epoll_wait_old",
+	[__NR_remap_file_pages] = "remap_file_pages",
+	[__NR_getdents64] = "getdents64",
+	[__NR_set_tid_address] = "set_tid_address",
+	[__NR_restart_syscall] = "restart_syscall",
+	[__NR_semtimedop] = "semtimedop",
+	[__NR_fadvise64] = "fadvise64",
+	[__NR_timer_create] = "timer_create",
+	[__NR_timer_settime] = "timer_settime",
+	[__NR_timer_gettime] = "timer_gettime",
+	[__NR_timer_getoverrun] = "timer_getoverrun",
+	[__NR_timer_delete] = "timer_delete",
+	[__NR_clock_settime] = "clock_settime",
+	[__NR_clock_gettime] = "clock_gettime",
+	[__NR_clock_getres] = "clock_getres",
+	[__NR_clock_nanosleep] = "clock_nanosleep",
+	[__NR_exit_group] = "exit_group",
+	[__NR_epoll_wait] = "epoll_wait",
+	[__NR_epoll_ctl] = "epoll_ctl",
+	[__NR_tgkill] = "tgkill",
+	[__NR_utimes] = "utimes",
+	[__NR_vserver] = "vserver",
+	[__NR_mbind] = "mbind",
+	[__NR_set_mempolicy] = "set_mempolicy",
+	[__NR_get_mempolicy] = "get_mempolicy",
+	[__NR_mq_open] = "mq_open",
+	[__NR_mq_unlink] = "mq_unlink",
+	[__NR_mq_timedsend] = "mq_timedsend",
+	[__NR_mq_timedreceive] = "mq_timedreceive",
+	[__NR_mq_notify] = "mq_notify",
+	[__NR_mq_getsetattr] = "mq_getsetattr",
+	[__NR_kexec_load] = "kexec_load",
+	[__NR_waitid] = "waitid",
+	[__NR_add_key] = "add_key",
+	[__NR_request_key] = "request_key",
+	[__NR_keyctl] = "keyctl",
+	[__NR_ioprio_set] = "ioprio_set",
+	[__NR_ioprio_get] = "ioprio_get",
+	[__NR_inotify_init] = "inotify_init",
+	[__NR_inotify_add_watch] = "inotify_add_watch",
+	[__NR_inotify_rm_watch] = "inotify_rm_watch",
+	[__NR_migrate_pages] = "migrate_pages",
+	[__NR_openat] = "openat",
+	[__NR_mkdirat] = "mkdirat",
+	[__NR_mknodat] = "mknodat",
+	[__NR_fchownat] = "fchownat",
+	[__NR_futimesat] = "futimesat",
+	[__NR_newfstatat] = "newfstatat",
+	[__NR_unlinkat] = "unlinkat",
+	[__NR_renameat] = "renameat",
+	[__NR_linkat] = "linkat",
+	[__NR_symlinkat] = "symlinkat",
+	[__NR_readlinkat] = "readlinkat",
+	[__NR_fchmodat] = "fchmodat",
+	[__NR_faccessat] = "faccessat",
+	[__NR_pselect6] = "pselect6",
+	[__NR_ppoll] = "ppoll",
+	[__NR_unshare] = "unshare",
+	[__NR_set_robust_list] = "set_robust_list",
+	[__NR_get_robust_list] = "get_robust_list",
+	[__NR_splice] = "splice",
+	[__NR_tee] = "tee",
+	[__NR_sync_file_range] = "sync_file_range",
+	[__NR_vmsplice] = "vmsplice",
+	[__NR_move_pages] = "move_pages",
+	[__NR_utimensat] = "utimensat",
+	[__NR_epoll_pwait] = "epoll_pwait",
+	[__NR_signalfd] = "signalfd",
+	[__NR_timerfd_create] = "timerfd_create",
+	[__NR_eventfd] = "eventfd",
+	[__NR_fallocate] = "fallocate",
+	[__NR_timerfd_settime] = "timerfd_settime",
+	[__NR_timerfd_gettime] = "timerfd_gettime",
+	[__NR_accept4] = "accept4",
+	[__NR_signalfd4] = "signalfd4",
+	[__NR_eventfd2] = "eventfd2",
+	[__NR_epoll_create1] = "epoll_create1",
+	[__NR_dup3] = "dup3",
+	[__NR_pipe2] = "pipe2",
+	[__NR_inotify_init1] = "inotify_init1",
+	[__NR_preadv] = "preadv",
+	[__NR_pwritev] = "pwritev",
+	[__NR_rt_tgsigqueueinfo] = "rt_tgsigqueueinfo",
+	[__NR_perf_event_open] = "perf_event_open",
+	[__NR_recvmmsg] = "recvmmsg",
+	[__NR_fanotify_init] = "fanotify_init",
+	[__NR_fanotify_mark] = "fanotify_mark",
+	[__NR_prlimit64] = "prlimit64",
+	[__NR_name_to_handle_at] = "name_to_handle_at",
+	[__NR_open_by_handle_at] = "open_by_handle_at",
+	[__NR_clock_adjtime] = "clock_adjtime",
+	[__NR_syncfs] = "syncfs",
+	[__NR_sendmmsg] = "sendmmsg",
+	[__NR_setns] = "setns",
+	[__NR_getcpu] = "getcpu",
+	[__NR_process_vm_readv] = "process_vm_readv",
+	[__NR_process_vm_writev] = "process_vm_writev",
+	[__NR_kcmp] = "kcmp",
+
+// x32-specific system call on amd64 start from 512
+
+        [512] = "rt_sigaction",
+        [513] = "rt_sigreturn",
+        [514] = "ioctl",
+        [515] = "readv",
+        [516] = "writev",
+        [517] = "recvfrom",
+        [518] = "sendmsg",
+        [519] = "recvmsg",
+        [520] = "execve",
+        [521] = "ptrace",
+        [522] = "rt_sigpending",
+        [523] = "rt_sigtimedwait",
+        [524] = "rt_sigqueueinfo",
+        [525] = "sigaltstack",
+        [526] = "timer_create",
+        [527] = "mq_notify",
+        [528] = "kexec_load",
+        [529] = "waitid",
+        [530] = "set_robust_list",
+        [531] = "get_robust_list",
+        [532] = "vmsplice",
+        [533] = "move_pages",
+        [534] = "preadv",
+        [535] = "pwritev",
+        [536] = "rt_tgsigqueueinfo",
+        [537] = "recvmmsg",
+        [538] = "sendmmsg",
+        [539] = "process_vm_readv",
+        [540] = "process_vm_writev",
+        [541] = "setsockopt",
+        [542] = "getsockopt",
+};
+
+#endif /* _SCNUMS_AMD64_H */

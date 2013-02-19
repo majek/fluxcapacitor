@@ -7,14 +7,14 @@
 #include <signal.h>
 #include <execinfo.h>
 
-#include <libgen.h> 		/* dirname(3) */
-#include <dlfcn.h>		/* dlopen(3) */
+#include <libgen.h>
+#include <dlfcn.h>
 
 #include "types.h"
 #include "list.h"
 
 #include "fluxcapacitor.h"
-#include "syscall_table.h"
+#include "scnums.h"
 
 
 extern struct options options;
@@ -327,7 +327,15 @@ u64 str_to_time(const char *s) {
 }
 
 const char *syscall_to_str(int no) {
-	if (no >= 0 && (unsigned)no < sizeof(syscall_table) / sizeof(char*))
-		return syscall_table[no];
-	return NULL;
+	static char buf[32];
+	const char *r = NULL;
+	const int map_sz = sizeof(syscall_to_str_map) / sizeof(syscall_to_str_map[0]);
+	if (no >= 0 && no < map_sz) {
+		r = syscall_to_str_map[no];
+	}
+	if (!r) {
+		snprintf(buf, sizeof(buf), "syscall_%i", no);
+		r = buf;
+	}
+	return r;
 }

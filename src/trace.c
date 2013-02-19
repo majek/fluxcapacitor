@@ -13,16 +13,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/ptrace.h>
-#include <asm/ptrace.h>
-#include <sys/wait.h>
 #include <errno.h>
-#include <sys/signalfd.h>
 #include <fcntl.h>
-#include <sys/user.h>
-#include <sys/types.h>
-#include <dirent.h>
 #include <limits.h>
+
+#include <sys/types.h>
+#include <sys/ptrace.h>
+#include <sys/wait.h>
+#include <sys/signalfd.h>
+#include <sys/user.h>
 
 #include "list.h"
 #include "trace.h"

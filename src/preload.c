@@ -8,9 +8,9 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/timeb.h>
-#include <sys/syscall.h>
 
 #include "types.h"
+#include "scnums.h"
 
 static int (*libc_gettimeofday)(struct timeval *tv, struct timezone *tz);
 static int (*libc_ftime)(struct timeb *tp);
@@ -44,7 +44,7 @@ PUBLIC
 int clock_gettime(clockid_t clk_id, struct timespec *tp) {
 	/* Ignore clk_id. Don't use libc version - we want a
 	 * ptrace-able syscall not a vdso call. */
-	return syscall(SYS_clock_gettime, CLOCK_REALTIME, tp);
+	return syscall(__NR_clock_gettime, CLOCK_REALTIME, tp);
 }
 
 /* Translate to clock_gettime() */
@@ -53,7 +53,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz) {
 	long a = 0, b = 0;
 	if (tv) {
 		struct timespec ts;
-		a = syscall(SYS_clock_gettime, CLOCK_REALTIME, &ts);
+		a = syscall(__NR_clock_gettime, CLOCK_REALTIME, &ts);
 		*tv = (struct timeval){ts.tv_sec, ts.tv_nsec / 1000ULL};
 	}
 	if (tz) {
@@ -66,7 +66,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz) {
 PUBLIC
 time_t time(time_t *t) {
 	struct timespec ts;
-	syscall(SYS_clock_gettime, CLOCK_REALTIME, &ts);
+	syscall(__NR_clock_gettime, CLOCK_REALTIME, &ts);
 	if (t) {
 		*t = ts.tv_sec;
 	}
@@ -78,7 +78,7 @@ int ftime(struct timeb *tp) {
 	if (tp) {
 		libc_ftime(tp);
 		struct timespec ts;
-		syscall(SYS_clock_gettime, CLOCK_REALTIME, &ts);
+		syscall(__NR_clock_gettime, CLOCK_REALTIME, &ts);
 		tp->time = ts.tv_sec;
 		tp->millitm = ts.tv_nsec / 1000000ULL;
 	}
