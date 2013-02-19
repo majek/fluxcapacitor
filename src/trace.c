@@ -7,6 +7,9 @@
   http://www.linuxjournal.com/article/6210?page=0,1
 */
 
+/* required for pread() */
+#define _XOPEN_SOURCE 500
+/* required for long offsets for pread */
 #define _FILE_OFFSET_BITS 64
 
 #include <stdio.h>
