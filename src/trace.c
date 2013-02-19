@@ -22,6 +22,7 @@
 #include <sys/wait.h>
 #include <sys/signalfd.h>
 #include <sys/user.h>
+#include <sys/stat.h>
 
 #include "list.h"
 #include "trace.h"
@@ -183,7 +184,10 @@ int trace_process_count(struct trace *trace) {
 static int mem_fd_open(int pid) {
 	char path[64];
 	snprintf(path, sizeof(path), "/proc/%i/mem", pid);
-	return open(path, O_RDONLY | O_CLOEXEC);
+	int fd = open(path, O_RDONLY);
+	if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1)
+		PFATAL("fcntl(FD_CLOEXEC)");
+	return fd;
 }
 
 static struct trace_process *trace_process_new(struct trace *trace, int pid) {
