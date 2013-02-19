@@ -29,17 +29,17 @@ struct options {
 	/* Path to .so files */
 	char *libpath;
 
-	/* Don't spam console */
+	/* Don't spam the console */
 	int quiet;
-	
+
 	FILE *shoutstream;
 
 	/* Should we exit? */
 	int exit_forced;
-	
+
 	/* Exit status of first failed child */
 	int exit_status;
-	
+
 	/* Signo we'll use to continue the child. Must not be used by
 	   the child application. */
 	int signo;
@@ -57,7 +57,7 @@ struct parent {
 
 	int blocked_count;
 	struct list_head list_of_blocked;
-	
+
 	int started;
 
 	u64 time_drift;
