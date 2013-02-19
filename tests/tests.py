@@ -40,8 +40,9 @@ def at_most(seconds=None):
             ret = fn(self, *args, **kwargs)
             t1 = time.time()
             td = t1 - t0
-            self.assertLessEqual(td, seconds, "Task took %.1f, not %.1f seconds" \
-                                     % (td, seconds))
+            self.assertTrue(td <= seconds,
+                            "Task took %.1f, not %.1f seconds" \
+                                % (td, seconds))
             return ret
         return wrapper
     return decorator
