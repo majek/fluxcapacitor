@@ -96,10 +96,9 @@ u64 str_to_time(const char *s);
 const char *syscall_to_str(int no);
 
 /* parent.c */
-enum {
-	TIMEOUT_UNKNOWN = -1,
-	TIMEOUT_FOREVER = LLONG_MAX
-};
+#define TIMEOUT_UNKNOWN (-1)
+/* 2**63 - 1, LLONG_MAX but not depending on limits.h */
+#define	TIMEOUT_FOREVER (+9223372036854775807LL)
 
 struct trace;
 struct trace_process;
