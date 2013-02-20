@@ -141,7 +141,7 @@ static int on_trace_start(struct trace_process *process, int type, void *arg,
 			  void *userdata) {
 	if (type != TRACE_ENTER)
 		FATAL("");
-	int pid = (int)arg;
+	int pid = (long)arg;
 	SHOUT("[+] pid=%i started", pid);
 	struct parent *parent = (struct parent *)userdata;
 	struct child *child = child_new(parent, process, pid);

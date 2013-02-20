@@ -43,7 +43,7 @@ extern struct options options;
 /* On x86-64, RAX is set to -ENOSYS on system call entry.  How
    do we distinguish this from a system call that returns
    ENOSYS?  (marek: we don't) */
-# define SYSCALL_ENTRY (RET == -ENOSYS)
+# define SYSCALL_ENTRY ((long)RET == -ENOSYS)
 # define REGS_STRUCT struct user_regs_struct
 
 # define SYSCALL (regs.orig_rax)
@@ -236,7 +236,7 @@ int trace_execvp(struct trace *trace, char **argv) {
 
 	struct trace_process *process = trace_process_new(trace, pid);
 	/* On new process call trace->callback, not process->callback. */
-	trace->callback(process, TRACE_ENTER, (void*)pid, trace->userdata);
+	trace->callback(process, TRACE_ENTER, (void*)(long)pid, trace->userdata);
 	return pid;
 }
 
@@ -505,7 +505,7 @@ static int copy_to_user_ptrace(struct trace_process *process, unsigned long dst,
 }
 
 static int copy_from_user_fd(struct trace_process *process, void *dst,
-			     unsigned long src, size_t len) {
+			     unsigned long src, unsigned len) {
 	int r = pread(process->mem_fd, dst, len, src);
 	if (r < 0)
 		PFATAL("pread(\"/proc/%i/mem\", offset=0x%lx, len=%u) = %i",
