@@ -20,6 +20,17 @@ running network applications where server and client run in different
 processes and somewhat rely on time. It will also work with
 multithreaded applications.
 
+Another comparable project is:
+
+ * [libfaketime](https://github.com/wolfcw/libfaketime)
+
+Fluxcapacitor fundamentally differs from `libfaketime` - it can fake
+the time functions but the program still runs as usual. Fluxcapacitor
+on the other hand will make your program run faster and be 100% CPU
+constrained. It will do that by "speeding up" blocking
+syscalls. Faking time is a neccessary side effect of this technique.
+
+
 Internally Fluxcapacitor uses on `ptrace` syscall and `LD_PRELOAD`
 linker feature and thus is Linux specific.
 
