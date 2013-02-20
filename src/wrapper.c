@@ -33,6 +33,7 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 	case __NR_epoll_pwait:
 		type = TYPE_MSEC;value = sysarg->arg4; break;
 
+	case __NR_select:
 #ifdef __NR__newselect
 	case __NR__newselect:
 		type = TYPE_TIMEVAL; value = sysarg->arg5; break;
@@ -144,6 +145,7 @@ void wrapper_pacify_signal(struct child *child, struct trace_sysarg *sysarg) {
 #ifdef __NR__newselect
 	case __NR__newselect:
 #endif
+	case __NR_select:
 	case __NR_nanosleep:
 		if (-512 >= sysarg->ret && sysarg->ret >= -517) { // ERESTART_RESTARTBLOCK
 			sysarg->ret = 0;
