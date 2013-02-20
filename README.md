@@ -246,8 +246,8 @@ or just:
     make
 
 You can also run specific tests, but that's a bit more complex. For
-example to run `SingleProcess.test_sleep` from `tests/tests_basic.py`:
+example to run `SingleProcess.test_bash_sleep` from `tests/tests_basic.py`:
 
     FCPATH="$PWD/fluxcapacitor --libpath=$PWD" \
-        python tests/tests_basic.py SingleProcess.test_sleep
+        python tests/tests_basic.py SingleProcess.test_bash_sleep
 

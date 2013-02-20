@@ -201,6 +201,7 @@ static void *getMcontextEip(ucontext_t *uc) {
 #endif
 }
 
+/* TODO: replace with libunwind one day. */
 static void sigsegvHandler(int sig, siginfo_t *info, void *secret) {
 	ucontext_t *uc = (ucontext_t*) secret;
 	fprintf(stderr, "Crashed with signal %i\n", sig);

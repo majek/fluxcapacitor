@@ -161,17 +161,15 @@ static int on_trace(struct trace_process *process, int type, void *arg,
 
 	case TRACE_EXIT: {
 		struct trace_exitarg *exitarg = arg;
-		unsigned status = -1;
 		if (exitarg->type == TRACE_EXIT_NORMAL) {
 			SHOUT("[-] pid=%i exited with return status %u",
 			      child->pid, exitarg->value);
-			status = exitarg->value;
+			options.exit_status = MAX(options.exit_status,
+						  (unsigned)exitarg->value);
 		} else {
 			SHOUT("[-] pid=%i exited due to signal %u",
 			      child->pid, exitarg->value);
 		}
-		options.exit_status = MAX(options.exit_status,
-					  status);
 		child_del(child);
 		break; }
 
@@ -257,7 +255,6 @@ static void main_loop(char ***list_of_argv) {
 		/* Hurray, we're most likely waiting for a timeout. */
 		struct child *min_child = parent_min_timeout_child(parent);
 		static int done = 0;
-		//SHOUT("everyone's blocking! mbsp=%i", r);
 		if (min_child && !done) {
 			u64 speedup = min_child->blocked_timeout;
 			if (speedup < options.min_speedup) {
