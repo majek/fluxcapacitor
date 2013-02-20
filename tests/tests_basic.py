@@ -151,6 +151,9 @@ class SingleProcess(tests.TestCase):
             self.system("escript %s" % (filename,))
 
 
+    @at_most(seconds=0.5)
+    def test_perl_sleep(self):
+        self.system("perl -e 'sleep 10'")
 
 if __name__ == '__main__':
     import unittest
