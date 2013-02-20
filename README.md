@@ -224,7 +224,7 @@ To compile the thing you need `git`, `gcc` and `make`. This should do:
 
 or
 
-    $ sudo apt-get instal git gcc make
+    $ sudo apt-get install git gcc make
 
 Building
 ----
