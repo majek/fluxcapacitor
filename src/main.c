@@ -278,5 +278,10 @@ static u64 main_loop(char ***list_of_argv) {
 	parent_kill_all(parent, SIGINT);
 
 	trace_free(trace);
-	return parent->time_drift;
+
+	u64 time_drift = parent->time_drift;
+	free(parent);
+	free(uevent);
+
+	return time_drift;
 }
