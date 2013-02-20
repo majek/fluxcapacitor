@@ -364,7 +364,7 @@ static void process_evaluate(struct trace *trace,
 			trace_process_del(trace, process);
 			return;
 		} else {
-			SHOUT("pid=%i status 0x%x not understood!", process->pid, status);
+			SHOUT("%i status 0x%x not understood!", process->pid, status);
 		}
 	}
 

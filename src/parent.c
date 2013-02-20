@@ -24,7 +24,7 @@ void parent_run_one(struct parent *parent, struct trace *trace,
 		    char **child_argv) {
 	int pid = trace_execvp(trace, child_argv);
 	char *flat_argv = argv_join(child_argv, " ");
-	SHOUT("[+] pid=%i running: %s", pid, flat_argv);
+	SHOUT("[+] %i running: %s", pid, flat_argv);
 	free(flat_argv);
 }
 

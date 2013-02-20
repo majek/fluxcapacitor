@@ -150,7 +150,7 @@ static int on_trace_start(struct trace_process *process, int type, void *arg,
 	if (type != TRACE_ENTER)
 		FATAL("");
 	int pid = (long)arg;
-	SHOUT("[+] pid=%i started", pid);
+	SHOUT("[+] %i started", pid);
 	struct parent *parent = (struct parent *)userdata;
 	struct child *child = child_new(parent, process, pid);
 	return trace_continue(process, on_trace, child);
@@ -164,12 +164,12 @@ static int on_trace(struct trace_process *process, int type, void *arg,
 	case TRACE_EXIT: {
 		struct trace_exitarg *exitarg = arg;
 		if (exitarg->type == TRACE_EXIT_NORMAL) {
-			SHOUT("[-] pid=%i exited with return status %u",
+			SHOUT("[-] %i exited with return status %u",
 			      child->pid, exitarg->value);
 			options.exit_status = MAX(options.exit_status,
 						  (unsigned)exitarg->value);
 		} else {
-			SHOUT("[-] pid=%i exited due to signal %u",
+			SHOUT("[-] %i exited due to signal %u",
 			      child->pid, exitarg->value);
 		}
 		child_del(child);
@@ -267,7 +267,7 @@ static u64 main_loop(char ***list_of_argv) {
 			}
 			parent->time_drift += speedup;
 			done = 0;
-			SHOUT("[ ] Pid=%i speeding up %s() by %.3f sec",
+			SHOUT("[ ] %i speeding up %s() by %.3f sec",
 			      min_child->pid,
 			      syscall_to_str(min_child->syscall_no),
 			      speedup / 1000000000.0);
