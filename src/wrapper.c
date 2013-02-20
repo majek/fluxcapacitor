@@ -26,7 +26,7 @@ enum {
 void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 
 	int type = 0;
-	int value = 0;
+	long value = 0;
 
 	switch ((unsigned short)sysarg->number) {
 	case __NR_epoll_wait:
