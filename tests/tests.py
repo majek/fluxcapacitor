@@ -77,3 +77,25 @@ def compile(code=None):
             return ret
         return wrapper
     return decorator
+
+
+def savefile(text=None, suffix="txt"):
+    def decorator(fn):
+        @functools.wraps(fn)
+        def wrapper(self, *args, **kwargs):
+            (fd, compiled) = tempfile.mkstemp()
+            os.close(fd)
+            (fd, filename) = tempfile.mkstemp(suffix="." + suffix)
+            os.write(fd, text.lstrip() + '\n')
+            os.close(fd)
+            try:
+                kwargs['filename'] = filename
+                ret = fn(self, *args, **kwargs)
+            finally:
+                if not debug:
+                    os.unlink(filename)
+                else:
+                    print "debug: not unlinked %s" % (filename,)
+            return ret
+        return wrapper
+    return decorator
