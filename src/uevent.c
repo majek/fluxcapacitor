@@ -7,8 +7,9 @@
 
 #include "uevent.h"
 
+
 struct uevent *uevent_new(struct uevent *uevent) {
-	if (!uevent) 
+	if (!uevent)
 		uevent = malloc(sizeof(struct uevent));
 	memset(uevent, 0, sizeof(struct uevent));
 	uevent->used_slots = 0;
@@ -40,7 +41,8 @@ int uevent_select(struct uevent *uevent, struct timeval *timeout) {
 			mask |= UEVENT_WRITE;
 		}
 		if (mask) {
-			uevent->fdmap[i].callback(uevent, i, mask, uevent->fdmap[i].userdata);
+			uevent->fdmap[i].callback(uevent, i, mask,
+						  uevent->fdmap[i].userdata);
 		}
 	}
 	return r;
@@ -56,9 +58,11 @@ int uevent_loop(struct uevent *uevent) {
 }
 
 
-int uevent_yield(struct uevent *uevent, int fd, int mask, uevent_callback_t callback, void *userdata) {
+int uevent_yield(struct uevent *uevent, int fd, int mask,
+		 uevent_callback_t callback, void *userdata) {
 	if (fd >= __FD_SETSIZE) {
-		fprintf(stderr, "Can't handle more than %i descriptors.", __FD_SETSIZE);
+		fprintf(stderr, "Can't handle more than %i descriptors.",
+			__FD_SETSIZE);
 		abort();
 	}
 	if (!callback) {

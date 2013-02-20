@@ -7,7 +7,6 @@
 #include "trace.h"
 #include "fluxcapacitor.h"
 
-
 extern struct options options;
 
 
@@ -50,8 +49,6 @@ struct child *parent_min_timeout_child(struct parent *parent) {
 	    min_child->blocked_timeout >= TIMEOUT_FOREVER) {
 		return NULL;
 	}
-	// 1 sec max
-	// min_timeout = MIN(min_timeout, 1*1000000000LL);
 	return min_child;
 }
 
