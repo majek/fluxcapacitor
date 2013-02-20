@@ -171,6 +171,17 @@ With `fluxcapacitor` it's much faster:
 Development
 ====
 
+Prerequisites
+----
+
+To compile the thing you need `git`, `gcc` and `make`. This should do:
+
+    $ sudo yum git gcc make
+
+or
+
+    $ sudo apt-get instal git gcc make
+
 Building
 ----
 
