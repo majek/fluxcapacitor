@@ -23,6 +23,8 @@ multithreaded applications.
 Internally Fluxcapacitor uses on `ptrace` syscall and `LD_PRELOAD`
 linker feature and thus is Linux specific.
 
+<b>Join the <a href="https://groups.google.com/group/fluxcapacitor-dev/subscribe"><code>fluxcapacitor-dev</code> mailing list</b></a>. Or view <a href="http://groups.google.com/group/fluxcapacitor-dev">the archives</a>.
+
 
 Basic examples
 ----
