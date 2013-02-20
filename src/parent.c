@@ -28,9 +28,10 @@ void parent_run_one(struct parent *parent, struct trace *trace,
 	free(flat_argv);
 }
 
-struct child *parent_maybe_speedup(struct parent *parent) {
+struct child *parent_min_timeout_child(struct parent *parent) {
 	struct child *min_child = NULL;
 
+	/* All childs must be blocking */
 	if (parent->blocked_count != parent->child_count)
 		FATAL("");
 

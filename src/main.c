@@ -252,7 +252,7 @@ static void main_loop(char ***list_of_argv) {
 
 
 		/* Hurray, we're most likely waiting for a timeout. */
-		struct child *min_child = parent_maybe_speedup(parent);
+		struct child *min_child = parent_min_timeout_child(parent);
 		static int done = 0;
 		//SHOUT("everyone's blocking! mbsp=%i", r);
 		if (min_child && !done) {

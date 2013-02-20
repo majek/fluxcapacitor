@@ -108,7 +108,7 @@ struct trace_process;
 struct parent *parent_new();
 void parent_run_one(struct parent *parent, struct trace *trace,
 		    char **child_argv);
-struct child *parent_maybe_speedup(struct parent *parent);
+struct child *parent_min_timeout_child(struct parent *parent);
 void parent_kill_all(struct parent *parent, int signo);
 
 struct child *child_new(struct parent *parent, struct trace_process *process, int pid);
