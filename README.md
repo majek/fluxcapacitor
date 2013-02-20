@@ -108,7 +108,6 @@ syscalls that can be sped up:
    * `select()`, `_newselect()`, `pselect6()`
    * `poll()`, `ppoll()`
    * `nanosleep()`
-   * `futex()`
 
 ### Speeding up
 

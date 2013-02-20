@@ -3,8 +3,6 @@
 #include <errno.h>
 #include <time.h>
 
-#include <linux/futex.h>
-
 #include "list.h"
 #include "types.h"
 #include "trace.h"
@@ -55,12 +53,6 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 		/* Second argument to nanosleep() can be ignored, it's
 		   only supposed to be set on EINTR. */
 		type = TYPE_TIMESPEC; value = sysarg->arg1;
-		break;
-
-	case __NR_futex:
-		if (sysarg->arg2 == FUTEX_WAIT || sysarg->arg2 == FUTEX_WAIT_PRIVATE) {
-			type = TYPE_TIMESPEC; value = sysarg->arg4;
-		}
 		break;
 	}
 
@@ -148,32 +140,25 @@ int wrapper_syscall_exit(struct child *child, struct trace_sysarg *sysarg) {
  * ERESTART_RESTARTBLOCK or similar error. Here we rewrite this value
  * to a result that will read: "timeout". */
 void wrapper_pacify_signal(struct child *child, struct trace_sysarg *sysarg) {
+
+	long orig_ret = sysarg->ret;
+
 	switch (sysarg->number) {
 	case __NR_epoll_wait:
 	case __NR_epoll_pwait:
-		if (sysarg->ret == -EINTR) {
-			sysarg->ret = 0;
-		}
 #ifdef __NR__newselect
 	case __NR__newselect:
 #endif
 	case __NR_select:
 	case __NR_nanosleep:
-		if (-512 >= sysarg->ret && sysarg->ret >= -517) { // ERESTART_RESTARTBLOCK
-			sysarg->ret = 0;
-		}
 	case __NR_pselect6:
 	case __NR_poll:
-		if (-516 == sysarg->ret) {
+	case __NR_ppoll:
+		if (sysarg->ret == -EINTR) {
 			sysarg->ret = 0;
 		}
-	case __NR_ppoll:
-	case __NR_futex:		/* should be ETIMEOUT */
-		if (sysarg->ret != 0) {
-			fprintf(stderr, "can't fake resp %s=%li\n",
-				syscall_to_str(sysarg->number),
-				sysarg->ret);
-			return;
+		if (-512 >= sysarg->ret && sysarg->ret >= -517) { // ERESTART_RESTARTBLOCK
+			sysarg->ret = 0;
 		}
 		break;
 	default:
