@@ -50,7 +50,8 @@ struct options {
 	 * changes before speeding up time. */
 	u64 idleness_threshold;
 
-
+	/* Don't advance time in tiny chunks */
+	u64 min_speedup;
 };
 
 

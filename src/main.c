@@ -47,6 +47,7 @@ int main(int argc, char **argv) {
 	options.shoutstream = stderr;
 	options.signo = SIGURG;
 	options.idleness_threshold = 50 * 1000000ULL; /* 50ms */
+	options.min_speedup = 10 * 1000000ULL;	      /* 10ms */
 
 	handle_backtrace();
 	pin_cpu();
@@ -55,12 +56,13 @@ int main(int argc, char **argv) {
 	while (1) {
 		int option_index = 0;
 		static struct option long_options[] = {
-			{"libpath",  required_argument, 0,  0  },
-			{"help",     no_argument,       0, 'h' },
-			{"verbose",  no_argument,       0, 'v' },
-			{"signal",   required_argument, 0,  0  },
-			{"idleness", required_argument, 0,  0  },
-			{0,          0,                 0,  0  }
+			{"libpath",    required_argument, 0,  0  },
+			{"help",       no_argument,       0, 'h' },
+			{"verbose",    no_argument,       0, 'v' },
+			{"signal",     required_argument, 0,  0  },
+			{"idleness",   required_argument, 0,  0  },
+			{"minspeedup", required_argument, 0,  0  },
+			{0,            0,                 0,  0  }
 		};
 
 		int arg = getopt_long(argc, argv, "vh",
@@ -81,7 +83,11 @@ int main(int argc, char **argv) {
 			} else if (0 == strcasecmp(opt_name, "idleness")) {
 				options.idleness_threshold = str_to_time(optarg);
 				if (!options.idleness_threshold)
-					FATAL("Wrong TIMEOUT \"%s\".", optarg);
+					FATAL("Invalid --idleness_threshold \"%s\".", optarg);
+			} else if (0 == strcasecmp(opt_name, "minspeedup")) {
+				options.min_speedup = str_to_time(optarg);
+				if (!options.min_speedup)
+					FATAL("Invalid --min_speedup \"%s\".", optarg);
 			} else {
 				FATAL("Unknown option: %s", argv[optind]);
 			}
@@ -224,19 +230,17 @@ static void main_loop(char ***list_of_argv) {
 		sched_yield();
 
 		/* Continue only after some time passed with no action. */
-		if (!parent->child_count)
-			break;
-		timeout = NSEC_TIMEVAL(options.idleness_threshold);
-		r = uevent_select(uevent, &timeout);
-		if (r != 0)
-			continue;
+		if (parent->child_count) {
+			timeout = NSEC_TIMEVAL(options.idleness_threshold);
+			r = uevent_select(uevent, &timeout);
+			if (r != 0)
+				continue;
+		}
 
 		/* All childs started? */
 		if (*list_of_argv) {
 			parent_run_one(parent, trace, *list_of_argv);
 			list_of_argv ++;
-			if (!parent->child_count)
-				break;
 			uevent_select(uevent, NULL);
 			continue;
 		}
@@ -244,9 +248,8 @@ static void main_loop(char ***list_of_argv) {
 		/* Everyone's blocking? */
 		if (parent->blocked_count != parent->child_count) {
 			/* Need to wait for some process to block */
-			if (!parent->child_count)
-				break;
-			uevent_select(uevent, NULL);
+			if (parent->child_count)
+				uevent_select(uevent, NULL);
 			continue;
 		}
 
@@ -257,11 +260,10 @@ static void main_loop(char ***list_of_argv) {
 		//SHOUT("everyone's blocking! mbsp=%i", r);
 		if (min_child && !done) {
 			u64 speedup = min_child->blocked_timeout;
-			if (speedup < 10*1000000ULL) {
-				/* nah, let's just wait */
-				if (!parent->child_count)
-					break;
-				uevent_select(uevent, NULL);
+			if (speedup < options.min_speedup) {
+				/* too small benefit, just wait */
+				if (parent->child_count)
+					uevent_select(uevent, NULL);
 				continue;
 			}
 			parent->time_drift += speedup;
