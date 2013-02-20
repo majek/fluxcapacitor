@@ -12,12 +12,13 @@ It is somewhat similar to things like:
 While these tools patch time libraries in Ruby and Python,
 `fluxcapacitor` works on a lower layer and "patches" low-level
 syscalls. That way it can lie about time to any program in any
-programming language, as long as it runs on Linux.
+programming language as long as it runs on Linux.
 
 This approach has a significant advantage: it is possible to lie about
-time to more than a one processes at the same time. It is especially
-useful for running network applications where server and client run in
-different processes and somewhat rely on time.
+time to many processes at the same time. It is especially useful for
+running network applications where server and client run in different
+processes and somewhat rely on time. It will also work with
+multithreaded applications.
 
 Internally Fluxcapacitor uses on `ptrace` syscall and `LD_PRELOAD`
 linker feature and thus is Linux specific.
@@ -81,22 +82,64 @@ How does it work
 Fluxcapacitor internally does two things:
 
 1) It forces `fluxcapacitor_preload.so` to be preloaded using the
-`LD_PRELOAD` linux facility. This library is responsible for two things:
+`LD_PRELOAD` linux facility. This library is responsible for two
+things:
 
-   - It makes sure that `clock_gettime()` will use the standard
+   * It makes sure that `clock_gettime()` will use the standard
      syscall, not the ultra-fast VDSO mechanism. That gives us the
      opportunity to replace the return value of the system call later.
-   - It replaces various time-related libc functions: `clock_gettime()`,
-     `gettimeofday()`, `time()`, `ftime()`, `nanosleep()` and `clock_nanosleep()`
-     with variants using modified `clock_gettime()`. That simplifies syscall
-     semantics thus making some parts of the server code less involved.
+   * It replaces various time-related libc functions:
+     `clock_gettime()`, `gettimeofday()`, `time()`, `ftime()`,
+     `nanosleep()` and `clock_nanosleep()` with variants using
+     modified `clock_gettime()`. That simplifies syscall semantics
+     thus making some parts of the server code less involved.
 
 2) It runs given command, and its forked children, in a `ptrace()`
 sandbox capturing all the syscalls. Some syscalls - notably
 `clock_gettime` have original results returned by kernel overwritten
 by faked values. Other syscalls, like `select()`, `poll()` and
 `epoll_wait()` can be interrupted (by a signal) and the result will be
-set to look like a timeout had expired.
+set to look like a timeout had expired. Full list of recognized
+syscalls that can be sped up:
+
+   * `epoll_wait()`, `epoll_pwait()`
+   * `select()`, `_newselect()`, `pselect6()`
+   * `poll()`, `ppoll()`
+   * `nanosleep()`
+   * `futex()`
+
+### Speeding up
+
+Fluxcapacitor monitors all the syscalls run by the child
+processes. All the syscalls are relayed to the kernel, as they would
+work in normal circumstances. This operation continues until
+fluxcapacitor will notice that all the child processes are waiting on
+recognised time-related syscalls like `poll` or `select`. When that
+happens, fluxcapacitor decides to speed up the time. It advances
+internal timer and sends a signal (SIGURG by default) to the process
+that is blocked with the smallest timeout value. Fluxcapacitor then is
+woken up by the kernel to give it a chance to handle the signal to the
+child. It swallows the signal and sets the return value of the syscall
+to look like a timeout had expired. See the chart:
+
+```
+  child          fluxcapacitor              kernel
+  -----          -------------              ------
+
+   |
+   +--- select(1s) -->+
+                      |
+                      +------------------------>
+
+                      kill(child, SIGURG)
+
+                      +<---- signal received ---
+                      |
+                      (pretend it was a timeout)
+                      |
+   +<--- timeout -----+
+   |
+```
 
 
 When it won't work
@@ -105,15 +148,15 @@ When it won't work
 Fluxcapacitor won't work in a number of cases:
 
 1) If your code is statically compiled and `fluxcapacitor_preload.so`
-ld-preloaded library can't play its role.
+   ld-preloaded library can't play its role.
 
-2) If your code uses unpopular functions in the event loop, like:
-`signalfd()`, `sigwait()`, `wait()`, `waitpid()`, etc. Or if your
-program relies heavily on signals and things like `alert()`,
-`setitimer()` or `timerfd_create()`.
+2) If your code uses unpopular blocking functions in the event loop
+   like `signalfd()` and `sigwait()` or if your program relies heavily
+   on signals and things like `alert()`, `setitimer()` or
+   `timerfd_create()`.
 
 3) If your code uses file access or modification
-timestamps. `Fluxcapacitor` does not mock that.
+   timestamps. `Fluxcapacitor` does not mock that.
 
 Basically, for Fluxcapacitor to work all the time queries need to be
 done using `gettimeofday()` or `clock_gettime()` and all the waiting
