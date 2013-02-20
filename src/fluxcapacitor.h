@@ -19,20 +19,25 @@
 	} while (0)
 
 #define SHOUT(x...) do{						\
-		if (!options.quiet) {				\
+		if (options.verbose) {				\
 			fprintf(options.shoutstream, x);	\
 			fprintf(options.shoutstream, "\n");	\
 		}						\
 	} while (0)
 
+#define PRINT(x...) do{						\
+		if (options.verbose > 1) {     			\
+			fprintf(options.shoutstream, x);	\
+			fprintf(options.shoutstream, "\n");	\
+		}						\
+	} while (0)
 
 /* All the global state goes here */
 struct options {
 	/* Path to .so files */
 	char *libpath;
 
-	/* Don't spam the console */
-	int quiet;
+	int verbose;
 
 	FILE *shoutstream;
 

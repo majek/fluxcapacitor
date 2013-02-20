@@ -11,6 +11,8 @@
 #include "fluxcapacitor.h"
 #include "scnums.h"
 
+extern struct options options;
+
 
 enum {
 	TYPE_MSEC = 1,
@@ -62,10 +64,11 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 		break;
 	}
 
+	if (!type)
+		return;
+
 	s64 timeout = TIMEOUT_UNKNOWN;
 	switch (type) {
-	case 0: break;
-
 	case TYPE_MSEC:
 		if (value < 0) {
 			timeout = TIMEOUT_FOREVER;
@@ -101,6 +104,15 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 	default:
 		FATAL("");
 	}
+
+	if (type != TYPE_FOREVER) {
+		PRINT(" ~  %i blocking on %s() for %.3f sec",
+		      child->pid, syscall_to_str(sysarg->number), timeout / 1000000000.);
+	} else {
+		PRINT(" ~  %i blocking on %s() forever",
+		      child->pid, syscall_to_str(sysarg->number));
+	}
+
 
 	child->blocked_timeout = timeout;
 	child->syscall_no = sysarg->number;
@@ -167,5 +179,8 @@ void wrapper_pacify_signal(struct child *child, struct trace_sysarg *sysarg) {
 	default:
 		return;
 	}
+	PRINT(" ~  %i restarting %s(). kernel returned %li, changed to %li",
+	      child->pid, syscall_to_str(sysarg->number), orig_ret, sysarg->ret);
+
 	trace_setregs(child->process, sysarg);
 }

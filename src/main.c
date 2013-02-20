@@ -43,7 +43,7 @@ static void main_loop(char ***list_of_argv);
 
 int main(int argc, char **argv) {
 
-	options.quiet = 1;
+	options.verbose = 0;
 	options.shoutstream = stderr;
 	options.signo = SIGURG;
 	options.idleness_threshold = 50 * 1000000ULL; /* 50ms */
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
 			break; }
 
 		case 'v':
-			options.quiet = 0;
+			options.verbose += 1;
 			break;
 
 		case 'h':
@@ -129,6 +129,9 @@ int main(int argc, char **argv) {
 		child_argv ++;
 	}
 	free(list_of_argv);
+
+	PRINT(" ~  Exiting with code %i. Speedup %.3f sec.",
+	      options.exit_status, time_drift / 1000000000.);
 	return options.exit_status;
 }
 
