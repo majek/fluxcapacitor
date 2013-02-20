@@ -38,8 +38,7 @@ static void usage() {
 /* Global */
 struct options options;
 
-static void main_loop(char ***list_of_argv);
-
+static u64 main_loop(char ***list_of_argv);
 
 int main(int argc, char **argv) {
 
@@ -119,7 +118,7 @@ int main(int argc, char **argv) {
 
 	SHOUT("[.] LD_PRELOAD=%s", ldpreload_get());
 
-	main_loop(list_of_argv);
+	u64 time_drift = main_loop(list_of_argv);
 
 	free(options.libpath);
 	fflush(options.shoutstream);
@@ -205,7 +204,7 @@ static int on_trace(struct trace_process *process, int type, void *arg,
 	return 0;
 }
 
-static void main_loop(char ***list_of_argv) {
+static u64 main_loop(char ***list_of_argv) {
 	int r;
 	struct timeval timeout;
 
@@ -279,4 +278,5 @@ static void main_loop(char ***list_of_argv) {
 	parent_kill_all(parent, SIGINT);
 
 	trace_free(trace);
+	return parent->time_drift;
 }
