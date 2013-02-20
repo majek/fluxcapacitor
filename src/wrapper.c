@@ -31,7 +31,7 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 	switch ((unsigned short)sysarg->number) {
 	case __NR_epoll_wait:
 	case __NR_epoll_pwait:
-		type = TYPE_MSEC;value = sysarg->arg4; break;
+		type = TYPE_MSEC; value = sysarg->arg4; break;
 
 	case __NR_select:
 #ifdef __NR__newselect

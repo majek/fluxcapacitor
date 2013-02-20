@@ -99,7 +99,7 @@ u64 str_to_time(const char *s);
 const char *syscall_to_str(int no);
 
 /* parent.c */
-#define TIMEOUT_UNKNOWN (-1)
+#define TIMEOUT_UNKNOWN (-1LL)
 /* 2**63 - 1, LLONG_MAX but not depending on limits.h */
 #define	TIMEOUT_FOREVER (+9223372036854775807LL)
 
@@ -130,6 +130,8 @@ void child_fake_response(struct child *child, struct trace_sysarg *sysarg);
 
 #define TIMESPEC_NSEC(ts) ((ts)->tv_sec * 1000000000ULL + (ts)->tv_nsec)
 #define TIMEVAL_NSEC(ts) ((ts)->tv_sec * 1000000000ULL + (ts)->tv_usec * 1000ULL)
-#define NSEC_TIMESPEC(ns) (struct timespec){(ns) / 1000000000ULL, (ns) % 1000000000ULL}
-#define NSEC_TIMEVAL(ns) (struct timeval){(ns) / 1000000000ULL, ((ns) % 1000000000ULL) / 1000ULL }
+#define NSEC_TIMESPEC(ns) (struct timespec){(ns) / 1000000000ULL, \
+					    (ns) % 1000000000ULL}
+#define NSEC_TIMEVAL(ns) (struct timeval){(ns) / 1000000000ULL, \
+					 ((ns) % 1000000000ULL) / 1000ULL}
 #define MSEC_NSEC(ms)   ((ms) * 1000000ULL)
