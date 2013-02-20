@@ -20,11 +20,13 @@ class TestCase(unittest.TestCase):
         self.assertEqual(rc, returncode)
         return True
 
-    def system(self, cmd, returncode=0):
+    def system(self, cmd, returncode=0, ignore_stderr=False):
         if self.fcpath:
             final_cmd = "%s -- %s" % (self.fcpath, cmd)
         else:
             final_cmd = cmd
+        if ignore_stderr:
+            final_cmd += ' 2>/dev/null'
         if debug:
             print "debug: %r" % (final_cmd,)
         rc = subprocess.call(final_cmd, shell=True)

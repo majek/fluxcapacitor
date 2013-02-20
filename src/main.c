@@ -153,10 +153,14 @@ static int on_trace(struct trace_process *process, int type, void *arg,
 	struct child *child = userdata;
 	switch (type) {
 
-	case TRACE_EXIT:
-		SHOUT("[-] pid=%i exited", child->pid);
+	case TRACE_EXIT: {
+		struct trace_sysarg *sysarg = arg;
+		SHOUT("[-] pid=%i exited with return status %li",
+		      child->pid, sysarg->arg1);
+		options.exit_status = MAX(options.exit_status,
+					   (unsigned long)sysarg->arg1);
 		child_del(child);
-		return 0;
+		break; }
 
 	case TRACE_SYSCALL_ENTER: {
 		struct trace_sysarg *sysarg = arg;

@@ -229,7 +229,9 @@ int trace_execvp(struct trace *trace, char **argv) {
 		raise(SIGSTOP);
 
 		execvp(argv[0], argv);
-		PFATAL("execvp()");
+
+		char *flat_argv = argv_join(argv, " ");
+		PFATAL("execvp(\"%s\")", flat_argv);
 	}
 
 	struct trace_process *process = trace_process_new(trace, pid);

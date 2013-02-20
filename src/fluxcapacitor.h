@@ -25,6 +25,8 @@
 		}						\
 	} while (0)
 
+
+/* All the global state goes here */
 struct options {
 	/* Path to .so files */
 	char *libpath;
@@ -37,8 +39,8 @@ struct options {
 	/* Should we exit? */
 	int exit_forced;
 
-	/* Exit status of first failed child */
-	int exit_status;
+	/* Max exit status of the exited childs (unsinged) */
+	unsigned exit_status;
 
 	/* Signo we'll use to continue the child. Must not be used by
 	   the child application. */
@@ -47,6 +49,7 @@ struct options {
 	/* Wait for `idleness_threshold` ns of not handling any
 	 * changes before speeding up time. */
 	u64 idleness_threshold;
+
 
 };
 
