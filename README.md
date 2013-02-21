@@ -1,7 +1,7 @@
 Fluxcapacitor
 ----
 
-`Fluxcapacitor` is a tool for spoofing POSIX time functions.
+`Fluxcapacitor` is a tool for spoofing POSIX time functions and making your program run without blocking on timeouts on functions like `poll` and `select`.
 
 It is somewhat similar to things like:
 
@@ -235,7 +235,7 @@ To compile the thing you need `git`, `gcc` and `make`. This should do:
 
 or
 
-    $ sudo apt-get instal git gcc make
+    $ sudo apt-get install git gcc make
 
 Building
 ----
