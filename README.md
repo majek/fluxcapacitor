@@ -1,7 +1,7 @@
 Fluxcapacitor
 ----
 
-`Fluxcapacitor` is a tool for spoofing POSIX time functions.
+`Fluxcapacitor` is a tool for spoofing POSIX time functions and making your program run without blocking on timeouts on functions like `poll` and `select`.
 
 It is somewhat similar to things like:
 
