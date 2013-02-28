@@ -116,7 +116,7 @@ void ensure_libpath(const char *argv_0) {
 			if (!realpath(argv_0, tmp)) {
 				PFATAL("realpath(argv[0])");
 			}
-			char *path = dirname(tmp);
+			path = dirname(tmp);
 			if (dl_checkpath(path, TEST_LIBNAME)) break;
 
 			// 2. Linker resolution (ie: no slash in name)
