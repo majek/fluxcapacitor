@@ -48,7 +48,7 @@ a given time. For example:
 will halt terminal for 12 seconds. When you run it with
 `fluxcapacitor`:
 
-    $ ./fluxcapacitor --libpath=. -- sleep 12
+    $ ./fluxcapacitor -- sleep 12
 
 it will finish instantly. Cool, ha? To illustrate this:
 
@@ -57,14 +57,14 @@ it will finish instantly. Cool, ha? To illustrate this:
 
 while:
 
-    $ time ./fluxcapacitor --libpath=. -- sleep 12
+    $ time ./fluxcapacitor -- sleep 12
     real    0m0.057s
 
 Another example, take a look at this session:
 
     $ date
     Thu Feb 14 23:49:55 GMT 2013
-    $ ./fluxcapacitor --libpath=. -- bash -c "date; sleep 120; date"
+    $ ./fluxcapacitor -- bash -c "date; sleep 120; date"
     Thu Feb 14 23:49:57 GMT 2013
     Thu Feb 14 23:51:57 GMT 2013
     $ date
@@ -78,15 +78,15 @@ Ever heard of the
 [year 2038 problem](https://en.wikipedia.org/wiki/Year_2038_problem)?
 Here's how it's going to look like in action:
 
-    $ ./fluxcapacitor --libpath=. -- bash -c "sleep 700000000; date"
+    $ ./fluxcapacitor -- bash -c "sleep 700000000; date"
     Thu Apr 26 17:44:25 BST 2035
-    $ ./fluxcapacitor --libpath=. -- bash -c "sleep 800000000; date"
+    $ ./fluxcapacitor -- bash -c "sleep 800000000; date"
     Wed May 21 20:04:03 GMT 1902
 
 
 Finally, `fluxcapacitor` works with any programming language:
 
-    $ ./fluxcapacitor --libpath=. -- python -c "import time; time.sleep(1000)"
+    $ ./fluxcapacitor -- python -c "import time; time.sleep(1000)"
 
 
 How does it work
@@ -219,7 +219,7 @@ tests take 1 second each:
 
 With `fluxcapacitor` it's much faster:
 
-    $ ./fluxcapacitor --libpath=. -- python run_test.py
+    $ ./fluxcapacitor -- python run_test.py
     real    0m0.355s
 
 
