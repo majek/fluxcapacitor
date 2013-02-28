@@ -98,8 +98,10 @@ static int dl_checkpath(const char *path_prefix, const char *solib) {
 
 	void *handle = dlopen(filename, RTLD_LAZY | RTLD_LOCAL);
 	if (!handle) {
+		PRINT("[ ] Trying dlopen(\"%s\"): fail", filename);
 		return 0;
 	} else {
+		PRINT("[ ] Trying dlopen(\"%s\"): success", filename);
 		dlclose(handle);
 		return 1;
 	}
