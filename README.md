@@ -89,6 +89,27 @@ Finally, `fluxcapacitor` works with any programming language:
     $ ./fluxcapacitor -- python -c "import time; time.sleep(1000)"
 
 
+For the reference, `fluxcapacitor` usage info:
+
+```
+$ ./fluxcapacitor --help
+Usage:
+
+    fluxcapacitor [options] [ -- command [ arguments ... ] ... ]
+
+Options:
+
+  --libpath=PATH       Load fluxcapacitor_preload.so from
+                       selected PATH directory.
+  --signal=SIGNAL      Use specified signal to interrupt blocking
+                       syscall instead of SIGURG.
+  --idleness=TIMEOUT   Speed up time only when all processess were
+                       idle for more than TIMEOUT (50ms by default).
+  --verbose,-v         Print more stuff.
+  --help               Print this message.
+```
+
+
 How does it work
 ----
 
