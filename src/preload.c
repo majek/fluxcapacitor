@@ -26,10 +26,8 @@ static int (*libc_nanosleep)(const struct timespec *req, struct timespec *rem);
 
 #if __GNUC__ >= 4
 # define PUBLIC __attribute__ ((visibility ("default")))
-# define LOCAL  __attribute__ ((visibility ("hidden")))
 #else
 # define PUBLIC
-# define LOCAL
 #endif
 
 /* Not even attempting:
