@@ -155,6 +155,26 @@ class SingleProcess(tests.TestCase):
     def test_perl_sleep(self):
         self.system("perl -e 'sleep 10'")
 
+
+    @at_most(seconds=5.0)
+    @savefile(suffix="sh", text='''\
+    #!/bin/bash
+    echo "Unsorted: $*"
+    function f() {
+        sleep "$1"
+        echo -n "$1 "
+    }
+    while [ -n "$1" ]; do
+        f "$1" &
+        shift
+    done
+    echo -n "Sorted:   "
+    wait
+    echo
+    ''')
+    def test_erlang_sleep(self, filename=None):
+        self.system("bash %s 1 12 1231 123213 13212 > /dev/null" % (filename,))
+
 if __name__ == '__main__':
     import unittest
     unittest.main()
