@@ -172,7 +172,7 @@ class SingleProcess(tests.TestCase):
     wait
     echo
     ''')
-    def test_erlang_sleep(self, filename=None):
+    def test_sleep_search(self, filename=None):
         self.system("bash %s 1 12 1231 123213 13212 > /dev/null" % (filename,))
 
 if __name__ == '__main__':
