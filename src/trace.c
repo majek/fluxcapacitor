@@ -68,7 +68,41 @@ extern struct options options;
 # define ARG6 (regs.ebp)
 # define RET (regs.eax)
 
-#elif defined(__ARMEL__)
+#elif defined(__arm__)
+
+/*
+ * This struct defines the way the registers are stored on the
+ * stack during a system call.  Note that sizeof(struct pt_regs)
+ * has to be a multiple of 8.
+ */
+struct pt_regs {
+	long uregs[18];
+};
+
+#define ARM_cpsr	uregs[16]
+#define ARM_pc		uregs[15]
+#define ARM_lr		uregs[14]
+#define ARM_sp		uregs[13]
+#define ARM_ip		uregs[12]
+#define ARM_fp		uregs[11]
+#define ARM_r10		uregs[10]
+#define ARM_r9		uregs[9]
+#define ARM_r8		uregs[8]
+#define ARM_r7		uregs[7]
+#define ARM_r6		uregs[6]
+#define ARM_r5		uregs[5]
+#define ARM_r4		uregs[4]
+#define ARM_r3		uregs[3]
+#define ARM_r2		uregs[2]
+#define ARM_r1		uregs[1]
+#define ARM_r0		uregs[0]
+#define ARM_ORIG_r0	uregs[17]
+
+/*
+ * The size of the user-visible VFP state as seen by PTRACE_GET/SETVFPREGS
+ * and core dumps.
+ */
+#define ARM_VFPREGS_SIZE ( 32 * 8 /*fpregs*/ + 4 /*fpscr*/ )
 
 # define REGS_STRUCT struct pt_regs
 /* ip is set to 0 on system call entry, 1 on exit.  */
