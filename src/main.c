@@ -80,12 +80,13 @@ int main(int argc, char **argv) {
 				if (!options.signo)
 					FATAL("Unrecognised signal \"%s\"", optarg);
 			} else if (0 == strcasecmp(opt_name, "idleness")) {
-				options.idleness_threshold = str_to_time(optarg);
-				if (!options.idleness_threshold)
+				int r = str_to_time(optarg,
+						    &options.idleness_threshold);
+				if (r)
 					FATAL("Invalid --idleness_threshold \"%s\".", optarg);
 			} else if (0 == strcasecmp(opt_name, "minspeedup")) {
-				options.min_speedup = str_to_time(optarg);
-				if (!options.min_speedup)
+				int r = str_to_time(optarg, &options.min_speedup);
+				if (r)
 					FATAL("Invalid --min_speedup \"%s\".", optarg);
 			} else {
 				FATAL("Unknown option: %s", argv[optind]);

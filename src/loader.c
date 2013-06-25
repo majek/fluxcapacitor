@@ -304,28 +304,28 @@ int str_to_signal(const char *s) {
 }
 
 
-u64 str_to_time(const char *s) {
+int str_to_time(const char *s, u64 *timens_ptr) {
 	char *end;
 	u64 v = strtoull(s, &end, 10);
 
 	if (end == s)
-		return 0;
+		return -1;
 
-	if (*end == '\0')
-		return v;
+	if (*end == '\0' ||
+	    strcasecmp(end, "ns") == 0 ||
+	    strcasecmp(end, "nsec") == 0) {
+		// already in ns
+	} else if (strcasecmp(end, "us") == 0 || strcasecmp(end, "usec") == 0) {
+		v *= 1000ULL;
+	} else if (strcasecmp(end, "ms") == 0 || strcasecmp(end, "msec") == 0) {
+		v *= 1000000ULL;
+	} else if (strcasecmp(end, "s") == 0 || strcasecmp(end, "sec") == 0) {
+		v *= 1000000000ULL;
+	} else {
+		return -1;
+	}
 
-	if (strcasecmp(end, "ns") == 0 || strcasecmp(end, "nsec") == 0)
-		return v;
-
-	if (strcasecmp(end, "us") == 0 || strcasecmp(end, "usec") == 0)
-		return v * 1000ULL;
-
-	if (strcasecmp(end, "ms") == 0 || strcasecmp(end, "msec") == 0)
-		return v * 1000000ULL;
-
-	if (strcasecmp(end, "s") == 0 || strcasecmp(end, "sec") == 0)
-		return v * 1000000000ULL;
-
+	*timens_ptr = v;
 	return 0;
 }
 

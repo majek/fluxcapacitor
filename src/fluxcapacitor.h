@@ -101,7 +101,7 @@ void ldpreload_extend(const char *lib_path, const char *file);
 const char *ldpreload_get();
 void handle_backtrace();
 int str_to_signal(const char *s);
-u64 str_to_time(const char *s);
+int str_to_time(const char *s, u64 *timens_ptr);
 const char *syscall_to_str(int no);
 
 /* parent.c */
