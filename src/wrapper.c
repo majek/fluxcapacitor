@@ -151,7 +151,9 @@ void wrapper_pacify_signal(struct child *child, struct trace_sysarg *sysarg) {
 #ifdef __NR__newselect
 	case __NR__newselect:
 #endif
+#ifdef __NR_select
 	case __NR_select:
+#endif
 	case __NR_nanosleep:
 	case __NR_pselect6:
 	case __NR_poll:
