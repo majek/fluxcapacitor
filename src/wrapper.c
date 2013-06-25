@@ -33,7 +33,9 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 	case __NR_epoll_pwait:
 		type = TYPE_MSEC; value = sysarg->arg4; break;
 
+#ifdef __NR_select
 	case __NR_select:
+#endif
 #ifdef __NR__newselect
 	case __NR__newselect:
 		type = TYPE_TIMEVAL; value = sysarg->arg5; break;
