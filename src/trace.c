@@ -89,12 +89,6 @@ struct pt_regs {
 #define ARM_r0		uregs[0]
 #define ARM_ORIG_r0	uregs[17]
 
-/*
- * The size of the user-visible VFP state as seen by PTRACE_GET/SETVFPREGS
- * and core dumps.
- */
-#define ARM_VFPREGS_SIZE ( 32 * 8 /*fpregs*/ + 4 /*fpscr*/ )
-
 # define REGS_STRUCT struct pt_regs
 /* ip is set to 0 on system call entry, 1 on exit.  */
 # define SYSCALL_ENTRY (regs.ARM_ip == 0)
