@@ -21,6 +21,7 @@
 
 #include <sys/types.h>
 #include <sys/ptrace.h>
+#include <asm/ptrace.h>
 #include <sys/wait.h>
 #include <sys/signalfd.h>
 #include <sys/user.h>
@@ -75,19 +76,6 @@ extern struct options options;
  * stack during a system call.  Note that sizeof(struct pt_regs)
  * has to be a multiple of 8.
  */
-struct pt_regs {
-	long uregs[18];
-};
-
-#define ARM_r7		uregs[7]
-#define ARM_r6		uregs[6]
-#define ARM_r5		uregs[5]
-#define ARM_r4		uregs[4]
-#define ARM_r3		uregs[3]
-#define ARM_r2		uregs[2]
-#define ARM_r1		uregs[1]
-#define ARM_r0		uregs[0]
-#define ARM_ORIG_r0	uregs[17]
 
 # define REGS_STRUCT struct pt_regs
 /* ip is set to 0 on system call entry, 1 on exit.  */
