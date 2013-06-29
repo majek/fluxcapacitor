@@ -1,38 +1,38 @@
 Fluxcapacitor
 ----
 
-`Fluxcapacitor` is a tool for spoofing POSIX time functions and making your program run without blocking on timeouts on functions like `poll` and `select`.
+`Fluxcapacitor` is a tool for making your program run without blocking on timeouts, on functions like `poll` and `select`, by spoofing POSIX time functions.
 
-It is somewhat similar to things like:
+It is somewhat similar to:
 
  * [FreezeGun](http://stevepulec.com/freezegun/) for Python
  * [TimeCop](https://github.com/travisjeffery/timecop) or
    [DeLorean](https://github.com/bebanjo/delorean) for Ruby
 
 While these tools patch time libraries in Ruby and Python,
-`fluxcapacitor` works on a lower layer and "patches" low-level
-syscalls. That way it can lie about time to any program in any
-programming language as long as it runs on Linux.
+`fluxcapacitor` works on a lower layer by "patching" low-level
+syscalls. That way, it can lie about time to any program in any
+programming language, as long as it runs on Linux.
 
 This approach has a significant advantage: it is possible to lie about
 time to many processes at the same time. It is especially useful for
 running network applications where server and client run in different
-processes and somewhat rely on time. It will also work with
-multithreaded applications.
+processes which rely on time. It will also work with multithreaded 
+applications.
 
 Another comparable project is:
 
  * [libfaketime](https://github.com/wolfcw/libfaketime)
 
-Fluxcapacitor fundamentally differs from `libfaketime` - it can fake
-the time functions but the program still runs as usual. Fluxcapacitor
-on the other hand will make your program run faster and be 100% CPU
-constrained. It will do that by "speeding up" blocking
-syscalls. Faking time is a neccessary side effect of this technique.
+`Fluxcapacitor` is fundamentally different from `libfaketime`, which
+can fake the time functions, but doesn't affect the runtime of the
+program. Conversely, `fluxcapacitor` will make your program run faster
+and be 100% CPU constrained. It does that by "speeding up" blocking
+syscalls. Faking time is a neccessary side effect.
 
 
-Internally Fluxcapacitor uses on `ptrace` syscall and `LD_PRELOAD`
-linker feature and thus is Linux specific.
+Internally,`Fluxcapacitor` uses `ptrace` on syscalls and `LD_PRELOAD`,
+which is why it's Linux specific.
 
 <b>Join the <a href="https://groups.google.com/group/fluxcapacitor-dev/subscribe"><code>fluxcapacitor-dev</code> mailing list</b></a>. Or view <a href="http://groups.google.com/group/fluxcapacitor-dev">the archives</a>.
 
@@ -50,7 +50,7 @@ will halt terminal for 12 seconds. When you run it with
 
     $ ./fluxcapacitor -- sleep 12
 
-it will finish instantly. Cool, ha? To illustrate this:
+it will finish instantly. Cool, huh? To illustrate this:
 
     $ time sleep 12
     real    0m12.003s
@@ -89,7 +89,7 @@ Finally, `fluxcapacitor` works with any programming language:
     $ ./fluxcapacitor -- python -c "import time; time.sleep(1000)"
 
 
-For the reference, `fluxcapacitor` usage info:
+For reference, `fluxcapacitor` usage info:
 
 ```
 $ ./fluxcapacitor --help
@@ -128,13 +128,13 @@ things:
      modified `clock_gettime()`. That simplifies syscall semantics
      thus making some parts of the server code less involved.
 
-2) It runs given command, and its forked children, in a `ptrace()`
-sandbox capturing all the syscalls. Some syscalls - notably
-`clock_gettime` have original results returned by kernel overwritten
-by faked values. Other syscalls, like `select()`, `poll()` and
-`epoll_wait()` can be interrupted (by a signal) and the result will be
-set to look like a timeout had expired. Full list of recognized
-syscalls that can be sped up:
+2) It runs then given command and its forked children in a 
+`ptrace()` sandbox, capturing all syscalls. Some syscalls - notably 
+`clock_gettime`, have their original results returned from the kernel 
+overwritten by faked values. Other syscalls, like `select()`, 
+`poll()` and`epoll_wait()`, can be interrupted (by a signal) and the 
+result will be set to look like a timeout has expired. Full list of 
+recognized syscalls that can be sped up:
 
    * `epoll_wait()`, `epoll_pwait()`
    * `select()`, `_newselect()`, `pselect6()`
@@ -143,17 +143,16 @@ syscalls that can be sped up:
 
 ### Speeding up
 
-Fluxcapacitor monitors all the syscalls run by the child
-processes. All the syscalls are relayed to the kernel, as they would
-work in normal circumstances. This operation continues until
-fluxcapacitor will notice that all the child processes are waiting on
-recognised time-related syscalls like `poll` or `select`. When that
-happens, fluxcapacitor decides to speed up the time. It advances
-internal timer and sends a signal (SIGURG by default) to the process
-that is blocked with the smallest timeout value. Fluxcapacitor then is
-woken up by the kernel to give it a chance to handle the signal to the
-child. It swallows the signal and sets the return value of the syscall
-to look like a timeout had expired. See the chart:
+Fluxcapacitor monitors all syscalls run by the child processes. 
+All syscalls are relayed to the kernel, as normal. This operation 
+continues until fluxcapacitor notices that all the child processes 
+are waiting on recognised time-related syscalls, like `poll` or 
+`select`. When that happens, fluxcapacitor decides to speed up the time.
+It advances the internal timer and sends a signal (SIGURG by default) 
+to the process that is blocked with the smallest timeout value. 
+Fluxcapacitor is then woken up by the kernel to give it a chance to 
+pass the signal to the child. It swallows the signal and sets the return 
+value of the syscall to look like a timeout had expired. See diagram:
 
 ```
   child          fluxcapacitor              kernel
@@ -183,25 +182,25 @@ Fluxcapacitor won't work in a number of cases:
 1) If your code is statically compiled and `fluxcapacitor_preload.so`
    ld-preloaded library can't play its role.
 
-2) If your code uses unpopular blocking functions in the event loop
-   like `signalfd()` and `sigwait()` or if your program relies heavily
-   on signals and things like `alert()`, `setitimer()` or
+2) If your code uses unpopular blocking functions in the event loop,
+   like `signalfd()` and `sigwait()`, or if your program relies 
+   heavily on signals and things like `alert()`, `setitimer()`, or
    `timerfd_create()`.
 
 3) If your code uses file access or modification
    timestamps. `Fluxcapacitor` does not mock that.
 
-Basically, for Fluxcapacitor to work all the time queries need to be
-done using `gettimeofday()` or `clock_gettime()` and all the waiting
+Basically, for Fluxcapacitor to work all the time, queries need to be
+done using `gettimeofday()` or `clock_gettime()`, and all the waiting
 for timeouts must rely on `select()`, `poll()` or
-`epoll_wait()`. Fortunately that's the case in most programming
+`epoll_wait()`. Fortunately, that's the case in most programming
 languages.
 
 
 Advanced usage
 ----
 
-`Fluxcapacitor` main application is speeding up tests.
+`Fluxcapacitor`'s main application is speeding up tests.
 
 Say you have a "delayed echo" server and you want to test it. It echos
 messages, just delayed by a few seconds. You don't want your tests to
@@ -250,7 +249,8 @@ Development
 Prerequisites
 ----
 
-To compile the thing you need `git`, `gcc` and `make`. This should do:
+To compile the things you need are `git`, `gcc` and `make`. This 
+should do:
 
     $ sudo yum git gcc make
 
