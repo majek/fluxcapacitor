@@ -260,21 +260,27 @@ static u64 main_loop(char ***list_of_argv) {
 		static int done = 0;
 		if (min_child && !done) {
 			s64 now = TIMESPEC_NSEC(&uevent_now) + parent->time_drift;
-			/* if (now > min_child->blocked_until) */
-			/* 	FATAL("timeout already passed"); */
 			s64 speedup = min_child->blocked_until - now;
-			if (speedup < (s64)options.min_speedup) {
-				/* too small benefit, just wait */
-				if (parent->child_count)
-					uevent_select(uevent, NULL);
-				continue;
+			if (speedup > 0) {
+				if (speedup < (s64)options.min_speedup) {
+					/* too small benefit, just wait */
+					if (parent->child_count)
+						uevent_select(uevent, NULL);
+					continue;
+				}
+				SHOUT("[ ] %i speeding up %s() by %.3f sec",
+				      min_child->pid,
+				      syscall_to_str(min_child->syscall_no),
+				      speedup / 1000000000.0);
+			} else {
+				/* Timeout already passed, wake up the process */
+				speedup = 0;
+				SHOUT("[ ] %i waking up %s()",
+				      min_child->pid,
+				      syscall_to_str(min_child->syscall_no));
 			}
 			parent->time_drift += speedup;
 			done = 0;
-			SHOUT("[ ] %i speeding up %s() by %.3f sec",
-			      min_child->pid,
-			      syscall_to_str(min_child->syscall_no),
-			      speedup / 1000000000.0);
 			min_child->interrupted = 1;
 			child_kill(min_child, options.signo);
 		}
