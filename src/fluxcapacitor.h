@@ -1,6 +1,8 @@
 #define TEST_LIBNAME "fluxcapacitor_test.so"
 #define PRELOAD_LIBNAME "fluxcapacitor_preload.so"
 
+extern struct timespec uevent_now;
+
 #define ERRORF(x...)  fprintf(stderr, x)
 #define FATAL(x...) do {					\
 		ERRORF("[-] PROGRAM ABORT : " x);		\
@@ -81,7 +83,7 @@ struct child {
 	struct list_head in_blocked;
 
 	int blocked;
-	s64 blocked_timeout;
+	s64 blocked_until;
 
 	struct parent *parent;
 	struct trace_process *process;

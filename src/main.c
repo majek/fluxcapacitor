@@ -259,8 +259,11 @@ static u64 main_loop(char ***list_of_argv) {
 		struct child *min_child = parent_min_timeout_child(parent);
 		static int done = 0;
 		if (min_child && !done) {
-			u64 speedup = min_child->blocked_timeout;
-			if (speedup < options.min_speedup) {
+			s64 now = TIMESPEC_NSEC(&uevent_now) + parent->time_drift;
+			/* if (now > min_child->blocked_until) */
+			/* 	FATAL("timeout already passed"); */
+			s64 speedup = min_child->blocked_until - now;
+			if (speedup < (s64)options.min_speedup) {
 				/* too small benefit, just wait */
 				if (parent->child_count)
 					uevent_select(uevent, NULL);

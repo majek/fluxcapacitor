@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <sys/select.h>
 #include <string.h>
 #include <sys/types.h>
 #include <errno.h>
 
 #include "uevent.h"
+
+struct timespec uevent_now;
 
 
 struct uevent *uevent_new(struct uevent *uevent) {
@@ -31,6 +34,9 @@ int uevent_select(struct uevent *uevent, struct timeval *timeout) {
 			abort();
 		}
 	}
+
+	clock_gettime(CLOCK_REALTIME, &uevent_now);
+
 	int i;
 	for (i=0; i < uevent->max_fd+1; i++) {
 		int mask = 0;

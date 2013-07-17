@@ -108,9 +108,16 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 	}
 
 
-	child->blocked_timeout = timeout;
+	switch (timeout) {
+	case TIMEOUT_UNKNOWN:
+	case TIMEOUT_FOREVER:
+		child->blocked_until = timeout;
+		break;
+	default:
+		child->blocked_until = (TIMESPEC_NSEC(&uevent_now) +
+					child->parent->time_drift + timeout);
+	}
 	child->syscall_no = sysarg->number;
-
 }
 
 int wrapper_syscall_exit(struct child *child, struct trace_sysarg *sysarg) {

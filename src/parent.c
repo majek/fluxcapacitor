@@ -37,16 +37,16 @@ struct child *parent_min_timeout_child(struct parent *parent) {
 	struct list_head *pos;
 	list_for_each(pos, &parent->list_of_childs) {
 		struct child *child = hlist_entry(pos, struct child, in_childs);
-		if (child->blocked_timeout != TIMEOUT_UNKNOWN) {
+		if (child->blocked_until != TIMEOUT_UNKNOWN) {
 			if (!min_child ||
-			    min_child->blocked_timeout > child->blocked_timeout) {
+			    min_child->blocked_until > child->blocked_until) {
 				min_child = child;
 			}
 		}
 	}
 	if (!min_child ||
-	    min_child->blocked_timeout <= 0 ||
-	    min_child->blocked_timeout >= TIMEOUT_FOREVER) {
+	    min_child->blocked_until <= 0 ||
+	    min_child->blocked_until >= TIMEOUT_FOREVER) {
 		return NULL;
 	}
 	return min_child;
@@ -66,7 +66,7 @@ void child_kill(struct child *child, int signo) {
 
 struct child *child_new(struct parent *parent, struct trace_process *process, int pid) {
 	struct child *child = calloc(1, sizeof(struct child));
-	child->blocked_timeout = TIMEOUT_UNKNOWN;
+	child->blocked_until = TIMEOUT_UNKNOWN;
 	child->pid = pid;
 	child->process = process;
 	child->parent = parent;
@@ -90,7 +90,7 @@ void child_mark_blocked(struct child *child) {
 		FATAL("");
 
 	child->blocked = 1;
-	child->blocked_timeout = TIMEOUT_UNKNOWN;
+	child->blocked_until = TIMEOUT_UNKNOWN;
 	list_add(&child->in_blocked, &child->parent->list_of_blocked);
 	child->parent->blocked_count += 1;
 }
