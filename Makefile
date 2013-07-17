@@ -29,7 +29,7 @@ $(LOADERNAME): Makefile $(LOADER_FILES)
 
 .PHONY:test
 test:
-	FCPATH="$(PWD)/$(LOADERNAME) --libpath=$(PWD)" python tests/tests_basic.py
+	FCPATH="$(PWD)/$(LOADERNAME)" python tests/tests_basic.py
 
 clean:
 	rm -f *.gcda *.so fluxcapacitor a.out gmon.out
