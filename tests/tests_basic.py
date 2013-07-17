@@ -17,6 +17,21 @@ if (os.system("erl -version >/dev/null 2>/dev/null") != 0 or
     erlang_present = False
 
 
+sleep_sort_script='''\
+#!/bin/bash
+echo "Unsorted: $*"
+function f() {
+    sleep "$1"
+    echo -n "$1 "
+}
+while [ -n "$1" ]; do
+    f "$1" &
+    shift
+done
+wait
+echo
+'''
+
 class SingleProcess(tests.TestCase):
     @at_most(seconds=0.5)
     def test_bash_sleep(self):
@@ -157,23 +172,14 @@ class SingleProcess(tests.TestCase):
 
 
     @at_most(seconds=5.0)
-    @savefile(suffix="sh", text='''\
-    #!/bin/bash
-    echo "Unsorted: $*"
-    function f() {
-        sleep "$1"
-        echo -n "$1 "
-    }
-    while [ -n "$1" ]; do
-        f "$1" &
-        shift
-    done
-    echo -n "Sorted:   "
-    wait
-    echo
-    ''')
-    def test_sleep_search(self, filename=None):
+    @savefile(suffix="sh", text=sleep_sort_script)
+    def test_sleep_sort(self, filename=None):
         self.system("bash %s 1 12 1231 123213 13212 > /dev/null" % (filename,))
+
+    @at_most(seconds=5.0)
+    @savefile(suffix="sh", text=sleep_sort_script)
+    def test_sleep_sort(self, filename=None):
+        self.system("bash %s 5 3 6 3 6 3 1 4 7 > /dev/null" % (filename,))
 
 if __name__ == '__main__':
     import unittest
