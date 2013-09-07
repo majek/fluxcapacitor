@@ -46,7 +46,6 @@ int main(int argc, char **argv) {
 	options.shoutstream = stderr;
 	options.signo = SIGURG;
 	options.idleness_threshold = 50 * 1000000ULL; /* 50ms */
-	options.min_speedup = 10 * 1000000ULL;	      /* 10ms */
 
 	handle_backtrace();
 	pin_cpu();
@@ -84,10 +83,6 @@ int main(int argc, char **argv) {
 						    &options.idleness_threshold);
 				if (r)
 					FATAL("Invalid --idleness_threshold \"%s\".", optarg);
-			} else if (0 == strcasecmp(opt_name, "minspeedup")) {
-				int r = str_to_time(optarg, &options.min_speedup);
-				if (r)
-					FATAL("Invalid --min_speedup \"%s\".", optarg);
 			} else {
 				FATAL("Unknown option: %s", argv[optind]);
 			}
@@ -262,12 +257,6 @@ static u64 main_loop(char ***list_of_argv) {
 			s64 now = TIMESPEC_NSEC(&uevent_now) + parent->time_drift;
 			s64 speedup = min_child->blocked_until - now;
 			if (speedup > 0) {
-				if (speedup < (s64)options.min_speedup) {
-					/* too small benefit, just wait */
-					if (parent->child_count)
-						uevent_select(uevent, NULL);
-					continue;
-				}
 				SHOUT("[ ] %i speeding up %s() by %.3f sec",
 				      min_child->pid,
 				      syscall_to_str(min_child->syscall_no),
