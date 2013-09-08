@@ -105,6 +105,7 @@ void handle_backtrace();
 int str_to_signal(const char *s);
 int str_to_time(const char *s, u64 *timens_ptr);
 const char *syscall_to_str(int no);
+int read_file(const char *fname, char *buf, int buf_sz);
 
 /* parent.c */
 #define TIMEOUT_UNKNOWN (-1LL)
@@ -117,6 +118,7 @@ struct parent *parent_new();
 void parent_run_one(struct parent *parent, struct trace *trace,
 		    char **child_argv);
 struct child *parent_min_timeout_child(struct parent *parent);
+struct child *parent_woken_child(struct parent *parent);
 void parent_kill_all(struct parent *parent, int signo);
 
 struct child *child_new(struct parent *parent, struct trace_process *process, int pid);

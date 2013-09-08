@@ -192,7 +192,6 @@ static int on_trace(struct trace_process *process, int type, void *arg,
 }
 
 static u64 main_loop(char ***list_of_argv) {
-	int r;
 	struct timeval timeout;
 
 	struct parent *parent = parent_new();
@@ -214,19 +213,44 @@ static u64 main_loop(char ***list_of_argv) {
 
 		/* Continue only after some time passed with no action. */
 		if (parent->child_count) {
-			/* If a scheduled syscall is to finish quickly, give
-			 * it time to do so. sched_yield() may not be ideal in
-			 * newer linux but it won't hurt. */
-			int i;
-			for (i = 0; i < 3; i++) {
-				sched_yield();
-				timeout = NSEC_TIMEVAL(1000000ULL); // 1ms
-				r = uevent_select(uevent, &timeout);
-				if (r != 0)
-					break;
-			}
+			/* Say a child process did a syscall that
+			 * produces side effects. For example a
+			 * network write. It make take a while before
+			 * the side effects become visible to another
+			 * watched process.
+			 *
+			 * Although from our point of view everyone's
+			 * "blocked", there may be some stuff
+			 * available but not yet processed by the
+			 * kernel. We must give some time for a kernel
+			 * to work it out.  */
+
+			/* First. Let's make it clear we want to give
+			 * priority to anybody requiring CPU now. */
+			sched_yield();
+			sched_yield();
+
+			/* Now, lets wait for 1us to see if anything
+			 * new arrived. Setting timeout to zero
+			 * doesn't work - kernel returns immediately
+			 * and doesn't do any work. Therefore we must
+			 * set the timeout to a smallest positive
+			 * value: 1us. */
+			timeout = NSEC_TIMEVAL(1000ULL); // 1us
+			int r = uevent_select(uevent, &timeout);
 			if (r != 0)
 				continue;
+
+			/* Finally, let's make sure all processes are
+			 * in 'S' sleeping state. They should be! */
+			struct child *woken = parent_woken_child(parent);
+			if (woken) {
+				SHOUT("[ ] %i Process not in a Sleeping state",
+				      woken->pid);
+				timeout = NSEC_TIMEVAL(10 * 1000000ULL); // 10ms
+				uevent_select(uevent, &timeout);
+				continue;
+			}
 		}
 
 		/* All childs started? */

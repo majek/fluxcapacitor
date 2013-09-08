@@ -6,6 +6,10 @@
 #include <sched.h>
 #include <signal.h>
 #include <execinfo.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include <libgen.h>
 #include <dlfcn.h>
@@ -340,5 +344,20 @@ const char *syscall_to_str(int no) {
 		snprintf(buf, sizeof(buf), "syscall_%i", no);
 		r = buf;
 	}
+	return r;
+}
+
+int read_file(const char *fname, char *buf, int buf_sz) {
+	int fd = open(fname, O_RDONLY);
+	if (fd < 0)
+		PFATAL("open(%s, O_RDONLY)", fname);
+	int r = read(fd, buf, buf_sz);
+	if (r < 0)
+		PFATAL("read()");
+	close(fd);
+
+	if (buf_sz && r == buf_sz)
+		r--;
+	buf[r] = '\0';
 	return r;
 }

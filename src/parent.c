@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <string.h>
 
 #include "list.h"
 #include "types.h"
@@ -50,6 +51,27 @@ struct child *parent_min_timeout_child(struct parent *parent) {
 		return NULL;
 	}
 	return min_child;
+}
+
+struct child *parent_woken_child(struct parent *parent) {
+	struct list_head *pos;
+	list_for_each(pos, &parent->list_of_childs) {
+		struct child *child = hlist_entry(pos, struct child, in_childs);
+		char fname[64];
+		snprintf(fname, sizeof(fname), "/proc/%i/stat", child->pid);
+		char buf[1024];
+		if (read_file(fname, buf, sizeof(buf)) < 16)
+			FATAL("%s is too small", fname);
+		// pray for a program name without parenthesis
+		char *p = strchr(buf, ')');
+		if (p[0] != ')')
+			FATAL("");
+		if (p[1] != ' ')
+			FATAL("");
+		if (p[2] != 'S')
+			return child;
+	}
+	return NULL;
 }
 
 void parent_kill_all(struct parent *parent, int signo) {
