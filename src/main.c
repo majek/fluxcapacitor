@@ -218,9 +218,9 @@ static u64 main_loop(char ***list_of_argv) {
 			 * it time to do so. sched_yield() may not be ideal in
 			 * newer linux but it won't hurt. */
 			int i;
-			for (i = 0; i < 2; i++) {
+			for (i = 0; i < 3; i++) {
 				sched_yield();
-				timeout = (struct timeval){0, 0};
+				timeout = NSEC_TIMEVAL(1000000ULL); // 1ms
 				r = uevent_select(uevent, &timeout);
 				if (r != 0)
 					break;
@@ -259,6 +259,8 @@ static u64 main_loop(char ***list_of_argv) {
 			child_kill(min_child, options.signo);
 		} else {
 			SHOUT(" ! Can't speedup!");
+			/* Wait for any event. */
+			uevent_select(uevent, NULL);
 		}
 	}
 	parent_kill_all(parent, SIGINT);

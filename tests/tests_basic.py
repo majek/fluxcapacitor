@@ -181,6 +181,17 @@ class SingleProcess(tests.TestCase):
     def test_sleep_sort(self, filename=None):
         self.system("bash %s 5 3 6 3 6 3 1 4 7 > /dev/null" % (filename,))
 
+    @at_most(seconds=2.0)
+    def test_parallel_sleeps(self):
+        stdout = self.system(' -- '.join(['bash -c "date +%s"',
+                                          'bash -c "sleep 60; date +%s"',
+                                          'bash -c "sleep 120; date +%s"']),
+                             capture_stdout=True)
+        a, b, c = [int(l) for l in stdout.split()]
+        assert 55 < (b - a) < 65, str(b-a)
+        assert 55 < (c - b) < 65, str(c-b)
+        assert 110 < (c - a) < 130, str(c-a)
+
 if __name__ == '__main__':
     import unittest
     unittest.main()

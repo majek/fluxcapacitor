@@ -20,7 +20,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(rc, returncode)
         return True
 
-    def system(self, cmd, returncode=0, ignore_stderr=False):
+    def system(self, cmd, returncode=0, ignore_stderr=False, capture_stdout=False):
         if self.fcpath:
             final_cmd = "%s -- %s" % (self.fcpath, cmd)
         else:
@@ -29,8 +29,18 @@ class TestCase(unittest.TestCase):
             final_cmd += ' 2>/dev/null'
         if debug:
             print "debug: %r" % (final_cmd,)
-        rc = subprocess.call(final_cmd, shell=True)
+
+        if capture_stdout:
+            stdout = tempfile.TemporaryFile()
+        else:
+            stdout = None
+
+        rc = subprocess.call(final_cmd, shell=True, stdout=stdout)
         self.assertEqual(rc, returncode)
+
+        if capture_stdout:
+            stdout.seek(0)
+            return stdout.read()
         return True
 
 
