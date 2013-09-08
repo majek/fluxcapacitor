@@ -1,5 +1,7 @@
+[![Build Status](https://travis-ci.org/majek/fluxcapacitor.png)](https://fluxcapacitor.org/majek/fluxcapacitor)
+
 Fluxcapacitor
-----
+=============
 
 `Fluxcapacitor` is a tool for making your program run without blocking on timeouts, on functions like `poll` and `select`, by spoofing POSIX time functions.
 

@@ -1,0 +1,21 @@
+language: c
+
+compiler:
+  - clang
+  - gcc
+
+branches:
+  only:
+    - master
+
+install:
+  - sudo apt-get -qq -y install nodejs erlang-nox
+  - make build
+
+script:
+  - make test
+
+notifications:
+  email:
+    recipients:
+      - travis@popcount.org

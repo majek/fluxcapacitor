@@ -15,15 +15,15 @@ all: build test
 build: $(TESTLIBNAME) $(LIBNAME) $(LOADERNAME)
 
 $(TESTLIBNAME): Makefile $(TESTLIB_FILES)
-	gcc $(COPTS) $(TESTLIB_FILES)	\
+	$(CC) $(COPTS) $(TESTLIB_FILES)	\
 		-fPIC -shared -Wl,-soname,$(TESTLIBNAME) -o $(TESTLIBNAME)
 
 $(LIBNAME): Makefile $(LIB_FILES)
-	gcc $(COPTS) $(LIB_FILES) $(LDOPTS) \
+	$(CC) $(COPTS) $(LIB_FILES) $(LDOPTS) \
 		-fPIC -shared -Wl,-soname,$(LIBNAME) -o $(LIBNAME)
 
 $(LOADERNAME): Makefile $(LOADER_FILES)
-	gcc $(COPTS) $(LOADER_FILES) $(LDOPTS) \
+	$(CC) $(COPTS) $(LOADER_FILES) $(LDOPTS) \
 		-o $(LOADERNAME)
 
 
