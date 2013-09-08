@@ -194,6 +194,9 @@ static int mem_fd_open(int pid) {
 	char path[64];
 	snprintf(path, sizeof(path), "/proc/%i/mem", pid);
 	int fd = open(path, O_RDONLY);
+	if (fd == -1)
+		PFATAL("open(%s, O_RDONLY)\n%s", path,
+		       "try: echo 0 > /proc/sys/kernel/yama/ptrace_scope");
 	if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1)
 		PFATAL("fcntl(FD_CLOEXEC)");
 	return fd;
@@ -288,14 +291,13 @@ static int process_stoped(struct trace *trace, struct trace_process *process,
 		struct trace_sysarg sysarg = {SYSCALL, ARG1, ARG2,
 					      ARG3, ARG4, ARG5, ARG6, RET};
 		process->regs = regs;
-		if (syscall_entry != !process->within_syscall) {
-			SHOUT("syscall entry - exit desynchronizaion");
-		} else {
-			int type = syscall_entry ? TRACE_SYSCALL_ENTER
-						 : TRACE_SYSCALL_EXIT;
-			process->callback(process, type, &sysarg,
-					  process->userdata);
-		}
+		if (syscall_entry != !process->within_syscall)
+			FATAL("syscall entry - exit desynchronizaion");
+
+		int type = syscall_entry ? TRACE_SYSCALL_ENTER
+			: TRACE_SYSCALL_EXIT;
+		process->callback(process, type, &sysarg,
+				  process->userdata);
 		process->within_syscall = !process->within_syscall;
 		break; }
 
@@ -338,7 +340,7 @@ static int process_stoped(struct trace *trace, struct trace_process *process,
 }
 
 static void process_evaluate(struct trace *trace,
-			   struct trace_process *process, int status) {
+			     struct trace_process *process, int status) {
 
 	int inject_signal = 0;
 
@@ -375,7 +377,6 @@ static void process_evaluate(struct trace *trace,
 		}
 	}
 
-
 	int r = ptrace(PTRACE_SYSCALL, process->pid, 0, inject_signal);
 	if (r < 0)
 		PFATAL("ptrace(PTRACE_SYSCALL)");
@@ -393,9 +394,6 @@ void trace_read(struct trace *trace) {
 	if (r % sizeof(struct signalfd_siginfo) != 0)
 		PFATAL("read(signal_fd) not aligned to signalfd_siginfo");
 
-	if (r == 0)
-		return;
-
 	/* Although signalfd() socket is capable of buffering signals,
 	 * losing one is still very much possible. Therefore it makes
 	 * no sense to actually look at the results of read(). */
@@ -407,7 +405,7 @@ void trace_read(struct trace *trace) {
 	 * (further down the child list in the kernel). But this is
 	 * not a big deal for us. */
 
-	while (1) {
+	while ( 1 ) {
 		int status;
 		int pid = waitpid(-1, &status, WNOHANG | __WALL);
 		if (pid == -1) {
@@ -421,6 +419,8 @@ void trace_read(struct trace *trace) {
 
 		struct trace_process *process = process_by_pid(trace, pid);
 		if (process) {
+			/* Process it immediately. The same pid can be
+			 * handled in this loop many times. */
 			process_evaluate(trace, process, status);
 		} else {
 			struct waitpid_report *sr =

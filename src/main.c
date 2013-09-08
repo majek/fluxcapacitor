@@ -24,7 +24,8 @@ static void usage() {
 "                       selected PATH directory.\n"
 "  --signal=SIGNAL      Use specified signal to interrupt blocking\n"
 "                       syscall instead of SIGURG.\n"
-"  --verbose,-v         Print more stuff.\n"
+"  --verbose,-v         Print more stuff. Repeat for debugging\n"
+"                       messages.\n"
 "  --help               Print this message.\n"
 "\n"
 		);
@@ -238,8 +239,7 @@ static u64 main_loop(char ***list_of_argv) {
 
 		/* Hurray, we're most likely waiting for a timeout. */
 		struct child *min_child = parent_min_timeout_child(parent);
-		static int done = 0;
-		if (min_child && !done) {
+		if (min_child) {
 			s64 now = TIMESPEC_NSEC(&uevent_now) + parent->time_drift;
 			s64 speedup = min_child->blocked_until - now;
 			if (speedup > 0) {
@@ -250,14 +250,15 @@ static u64 main_loop(char ***list_of_argv) {
 			} else {
 				/* Timeout already passed, wake up the process */
 				speedup = 0;
-				SHOUT("[ ] %i waking up %s()",
+				SHOUT("[ ] %i waking expired %s()",
 				      min_child->pid,
 				      syscall_to_str(min_child->syscall_no));
 			}
 			parent->time_drift += speedup;
-			done = 0;
 			min_child->interrupted = 1;
 			child_kill(min_child, options.signo);
+		} else {
+			SHOUT(" ! Can't speedup!");
 		}
 	}
 	parent_kill_all(parent, SIGINT);
