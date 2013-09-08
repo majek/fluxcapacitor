@@ -50,7 +50,7 @@ int trace_sfd(struct trace *trace);
 int trace_process_count(struct trace *trace);
 
 /* Main loop, call it when `sfd` is readable. */
-void trace_read(struct trace *trace);
+int trace_read(struct trace *trace);
 
 /* Set process callback. */
 int trace_continue(struct trace_process *process,

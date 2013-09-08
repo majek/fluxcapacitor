@@ -143,7 +143,7 @@ struct trace *trace_new(trace_callback callback, void *userdata) {
 	if (sigprocmask(SIG_BLOCK, &mask, NULL) == -1)
 		PFATAL("sigprocmask(SIG_BLOCK, [SIGCHLD])");
 
-	trace->sfd = signalfd(-1, &mask, SFD_CLOEXEC);
+	trace->sfd = signalfd(-1, &mask, SFD_CLOEXEC | SFD_NONBLOCK);
 	if (trace->sfd == -1)
 		PFATAL("signalfd()");
 	int i;
@@ -387,12 +387,17 @@ static void process_evaluate(struct trace *trace,
 
 
 /* Call this method when sfd is readable */
-void trace_read(struct trace *trace) {
+int trace_read(struct trace *trace) {
 	struct signalfd_siginfo sinfo[4];
 
 	int r = read(trace->sfd, &sinfo, sizeof(sinfo));
-	if (r < 0)
-		PFATAL("read(signal_fd)");
+	if (r < 0) {
+		if (errno == EWOULDBLOCK) {
+			r = 0;
+		} else {
+			PFATAL("read(signal_fd)");
+		}
+	}
 
 	if (r % sizeof(struct signalfd_siginfo) != 0)
 		PFATAL("read(signal_fd) not aligned to signalfd_siginfo");
@@ -407,6 +412,8 @@ void trace_read(struct trace *trace) {
 	 * waitpid(-1) we might starve processes with higher pids
 	 * (further down the child list in the kernel). But this is
 	 * not a big deal for us. */
+
+	int counter = 0;
 
 	while ( 1 ) {
 		int status;
@@ -432,6 +439,7 @@ void trace_read(struct trace *trace) {
 			sr->status = status;
 			list_add(&sr->in_list, &trace->list_of_waitpid_reports);
 		}
+		counter += 1;
 	}
 
 	/* Process waitpids from processess we don't know only after
@@ -456,6 +464,8 @@ void trace_read(struct trace *trace) {
 
 		free(sr);
 	}
+
+	return counter;
 }
 
 void trace_setregs(struct trace_process *process, struct trace_sysarg *sysarg) {
