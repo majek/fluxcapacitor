@@ -351,13 +351,36 @@ int read_file(const char *fname, char *buf, int buf_sz) {
 	int fd = open(fname, O_RDONLY);
 	if (fd < 0)
 		PFATAL("open(%s, O_RDONLY)", fname);
-	int r = read(fd, buf, buf_sz);
+	int r = read(fd, buf, buf_sz-1);
 	if (r < 0)
 		PFATAL("read()");
 	close(fd);
 
-	if (buf_sz && r == buf_sz)
-		r--;
 	buf[r] = '\0';
 	return r;
+}
+
+int proc_running() {
+	static int fd = -1;
+	if (fd == -1) {
+		fd = open("/proc/stat", O_RDONLY);
+	}
+
+	char buf[1024*16];
+	int r = pread(fd, buf, sizeof(buf)-1, 0);
+	if (r < 16)
+		FATAL("");
+	buf[r] = '\0';
+
+	char *start, *saveptr;
+	for (start = buf; ; start = NULL) {
+		char *line = strtok_r(start, "\n", &saveptr);
+		if (line == NULL)
+			break;
+		if (strncmp(line, "procs_running ", 14) == 0) {
+			return atoi(line + 14);
+		}
+	}
+	FATAL("Can't read /proc/stat!");
+	return -1;
 }

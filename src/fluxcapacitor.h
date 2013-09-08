@@ -106,6 +106,7 @@ int str_to_signal(const char *s);
 int str_to_time(const char *s, u64 *timens_ptr);
 const char *syscall_to_str(int no);
 int read_file(const char *fname, char *buf, int buf_sz);
+int proc_running();
 
 /* parent.c */
 #define TIMEOUT_UNKNOWN (-1LL)

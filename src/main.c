@@ -230,22 +230,39 @@ static u64 main_loop(char ***list_of_argv) {
 			sched_yield();
 			sched_yield();
 
+			/* Next, let's wait until we're the only
+			 * process in running state. This can be
+			 * painful on SMP.
+			 *
+			 * This also means fluxcapacitor won't work on
+			 * a busy system. */
+			if (proc_running() > 1) {
+				int c = 0;
+				while (proc_running() > 1) {
+					sched_yield();
+					c += 1;
+				}
+
+				SHOUT("[ ] Your system looks busy. It's better to wait (%i sched_yields)", c);
+				continue;
+			}
+
 			/* Now, lets wait for 1us to see if anything
 			 * new arrived. Setting timeout to zero
 			 * doesn't work - kernel returns immediately
 			 * and doesn't do any work. Therefore we must
-			 * set the timeout to a smallest positive
-			 * value: 1us. */
+			 * set the timeout to a next smallest value,
+			 * and 'select()' granularity is in us. */
 			timeout = NSEC_TIMEVAL(1000ULL); // 1us
 			int r = uevent_select(uevent, &timeout);
 			if (r != 0)
 				continue;
 
-			/* Finally, let's make sure all processes are
-			 * in 'S' sleeping state. They should be! */
+			/* Finally, make sure all processes are in 'S'
+			 * sleeping state. They should be! */
 			struct child *woken = parent_woken_child(parent);
 			if (woken) {
-				SHOUT("[ ] %i Process not in a Sleeping state",
+				SHOUT("[ ] %i Process not in 'S' state",
 				      woken->pid);
 				timeout = NSEC_TIMEVAL(10 * 1000000ULL); // 10ms
 				uevent_select(uevent, &timeout);
