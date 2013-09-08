@@ -24,8 +24,6 @@ static void usage() {
 "                       selected PATH directory.\n"
 "  --signal=SIGNAL      Use specified signal to interrupt blocking\n"
 "                       syscall instead of SIGURG.\n"
-"  --idleness=TIMEOUT   Speed up time only when all processess were\n"
-"                       idle for more than TIMEOUT (50ms by default).\n"
 "  --verbose,-v         Print more stuff.\n"
 "  --help               Print this message.\n"
 "\n"
@@ -45,7 +43,6 @@ int main(int argc, char **argv) {
 	options.verbose = 0;
 	options.shoutstream = stderr;
 	options.signo = SIGURG;
-	options.idleness_threshold = 50 * 1000000ULL; /* 50ms */
 
 	handle_backtrace();
 	pin_cpu();
@@ -58,8 +55,6 @@ int main(int argc, char **argv) {
 			{"help",       no_argument,       0, 'h' },
 			{"verbose",    no_argument,       0, 'v' },
 			{"signal",     required_argument, 0,  0  },
-			{"idleness",   required_argument, 0,  0  },
-			{"minspeedup", required_argument, 0,  0  },
 			{0,            0,                 0,  0  }
 		};
 
@@ -78,11 +73,6 @@ int main(int argc, char **argv) {
 				options.signo = str_to_signal(optarg);
 				if (!options.signo)
 					FATAL("Unrecognised signal \"%s\"", optarg);
-			} else if (0 == strcasecmp(opt_name, "idleness")) {
-				int r = str_to_time(optarg,
-						    &options.idleness_threshold);
-				if (r)
-					FATAL("Invalid --idleness_threshold \"%s\".", optarg);
 			} else {
 				FATAL("Unknown option: %s", argv[optind]);
 			}
@@ -214,21 +204,26 @@ static u64 main_loop(char ***list_of_argv) {
 	uevent_yield(uevent, trace_sfd(trace), UEVENT_READ, on_signal, trace);
 
 	while ((parent->child_count || *list_of_argv) && !options.exit_forced) {
-		/* Continue only after 1 ms of idleness */
-		timeout = (struct timeval){0, 1};
-		r = uevent_select(uevent, &timeout);
-		if (r != 0)
+		/* Is everyone blocking? */
+		if (parent->blocked_count != parent->child_count) {
+			/* Nope, need to wait for some process to block */
+			uevent_select(uevent, NULL);
 			continue;
-
-		/* If a scheduled syscall is to finish quickly, give
-		 * it time to do so. sched_yield() may not be ideal in
-		 * newer linux but it won't hurt. */
-		sched_yield();
+		}
 
 		/* Continue only after some time passed with no action. */
 		if (parent->child_count) {
-			timeout = NSEC_TIMEVAL(options.idleness_threshold);
-			r = uevent_select(uevent, &timeout);
+			/* If a scheduled syscall is to finish quickly, give
+			 * it time to do so. sched_yield() may not be ideal in
+			 * newer linux but it won't hurt. */
+			int i;
+			for (i = 0; i < 2; i++) {
+				sched_yield();
+				timeout = (struct timeval){0, 0};
+				r = uevent_select(uevent, &timeout);
+				if (r != 0)
+					break;
+			}
 			if (r != 0)
 				continue;
 		}
@@ -240,15 +235,6 @@ static u64 main_loop(char ***list_of_argv) {
 			uevent_select(uevent, NULL);
 			continue;
 		}
-
-		/* Everyone's blocking? */
-		if (parent->blocked_count != parent->child_count) {
-			/* Need to wait for some process to block */
-			if (parent->child_count)
-				uevent_select(uevent, NULL);
-			continue;
-		}
-
 
 		/* Hurray, we're most likely waiting for a timeout. */
 		struct child *min_child = parent_min_timeout_child(parent);
