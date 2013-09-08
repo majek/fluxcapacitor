@@ -230,6 +230,7 @@ static u64 main_loop(char ***list_of_argv) {
 			sched_yield();
 			sched_yield();
 
+#if 0
 			/* Next, let's wait until we're the only
 			 * process in running state. This can be
 			 * painful on SMP.
@@ -246,6 +247,7 @@ static u64 main_loop(char ***list_of_argv) {
 
 				SHOUT("[ ] Your system looks busy. I waited %i sched_yields.", c);
 			}
+#endif
 
 			/* Now, lets wait for 1us to see if anything
 			 * new arrived. Setting timeout to zero
@@ -267,7 +269,9 @@ static u64 main_loop(char ***list_of_argv) {
 				SHOUT("[ ] %i Process not in 'S' state",
 				      woken->pid);
 				timeout = NSEC_TIMEVAL(10 * 1000000ULL); // 10ms
-				uevent_select(uevent, &timeout);
+				int r = uevent_select(uevent, &timeout);
+				if (r == 0)
+					SHOUT("[ ] Waited for 10ms and nothing happened");
 				continue;
 			}
 		}
