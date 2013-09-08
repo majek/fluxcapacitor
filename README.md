@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/majek/fluxcapacitor.png)](https://fluxcapacitor.org/majek/fluxcapacitor)
+[![Build Status](https://travis-ci.org/majek/fluxcapacitor.png)](https://travis-ci.org/majek/fluxcapacitor)
 
 Fluxcapacitor
 =============
