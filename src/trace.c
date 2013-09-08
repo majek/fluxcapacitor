@@ -196,7 +196,10 @@ static int mem_fd_open(int pid) {
 	int fd = open(path, O_RDONLY);
 	if (fd == -1)
 		PFATAL("open(%s, O_RDONLY)\n%s", path,
-		       "try: echo 0 > /proc/sys/kernel/yama/ptrace_scope");
+		       "\t\t\tThis may be caused by trying to ptrace a detached\n"
+		       "\t\t\tprocess. Consider disabling the 'ptrace_scope'\n"
+		       "\t\t\tprotection. You may do this by running:\n"
+		       "\t\t\t  $ sudo sysctl kernel.yama.ptrace_scope=0");
 	if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1)
 		PFATAL("fcntl(FD_CLOEXEC)");
 	return fd;
