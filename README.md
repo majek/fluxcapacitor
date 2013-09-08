@@ -78,7 +78,8 @@ in reality.
 
 Ever heard of the
 [year 2038 problem](https://en.wikipedia.org/wiki/Year_2038_problem)?
-Here's how it's going to look like in action:
+Here's how it's going to look like in action (this works on 32 bit
+systems):
 
     $ ./fluxcapacitor -- bash -c "sleep 700000000; date"
     Thu Apr 26 17:44:25 BST 2035
@@ -105,8 +106,6 @@ Options:
                        selected PATH directory.
   --signal=SIGNAL      Use specified signal to interrupt blocking
                        syscall instead of SIGURG.
-  --idleness=TIMEOUT   Speed up time only when all processess were
-                       idle for more than TIMEOUT (50ms by default).
   --verbose,-v         Print more stuff.
   --help               Print this message.
 ```
@@ -130,12 +129,12 @@ things:
      modified `clock_gettime()`. That simplifies syscall semantics
      thus making some parts of the server code less involved.
 
-2) It runs then given command and its forked children in a 
-`ptrace()` sandbox, capturing all syscalls. Some syscalls - notably 
-`clock_gettime`, have their original results returned from the kernel 
-overwritten by faked values. Other syscalls, like `select()`, 
-`poll()` and`epoll_wait()`, can be interrupted (by a signal) and the 
-result will be set to look like a timeout has expired. Full list of 
+2) It runs then given command and its forked children in a `ptrace()`
+sandbox, capturing all syscalls. Some syscalls - notably
+`clock_gettime`, have their original results returned from the kernel
+overwritten by faked values. Other syscalls, like `select()`, `poll()`
+and`epoll_wait()`, can be interrupted (by a signal) and the result
+will be set to look like a timeout has expired. Full list of
 recognized syscalls that can be sped up:
 
    * `epoll_wait()`, `epoll_pwait()`
@@ -145,16 +144,17 @@ recognized syscalls that can be sped up:
 
 ### Speeding up
 
-Fluxcapacitor monitors all syscalls run by the child processes. 
-All syscalls are relayed to the kernel, as normal. This operation 
-continues until fluxcapacitor notices that all the child processes 
-are waiting on recognised time-related syscalls, like `poll` or 
-`select`. When that happens, fluxcapacitor decides to speed up the time.
-It advances the internal timer and sends a signal (SIGURG by default) 
-to the process that is blocked with the smallest timeout value. 
-Fluxcapacitor is then woken up by the kernel to give it a chance to 
-pass the signal to the child. It swallows the signal and sets the return 
-value of the syscall to look like a timeout had expired. See diagram:
+Fluxcapacitor monitors all syscalls run by the child processes.  All
+syscalls are relayed to the kernel, as normal. This operation
+continues until fluxcapacitor notices that all the child processes are
+waiting on recognised time-related syscalls, like `poll` or
+`select`. When that happens, fluxcapacitor decides to speed up the
+time.  It advances the internal timer and sends a signal (SIGURG by
+default) to the process that is blocked with the smallest timeout
+value.  Fluxcapacitor is then woken up by the kernel to give it a
+chance to pass the signal to the child. It swallows the signal and
+sets the return value of the syscall to look like a timeout had
+expired. See diagram:
 
 ```
   child          fluxcapacitor              kernel
