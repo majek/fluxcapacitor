@@ -243,8 +243,7 @@ static u64 main_loop(char ***list_of_argv) {
 					c += 1;
 				}
 
-				SHOUT("[ ] Your system looks busy. It's better to wait (%i sched_yields)", c);
-				continue;
+				SHOUT("[ ] Your system looks busy. I waited %i sched_yields.", c);
 			}
 
 			/* Now, lets wait for 1us to see if anything
