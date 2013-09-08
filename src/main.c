@@ -238,9 +238,10 @@ static u64 main_loop(char ***list_of_argv) {
 			 * a busy system. */
 			if (proc_running() > 1) {
 				int c = 0;
-				while (proc_running() > 1) {
+				for (c = 0; c < 3 * parent->child_count; c++) {
+					if (proc_running() < 2)
+						break;
 					sched_yield();
-					c += 1;
 				}
 
 				SHOUT("[ ] Your system looks busy. I waited %i sched_yields.", c);
@@ -252,7 +253,9 @@ static u64 main_loop(char ***list_of_argv) {
 			 * and doesn't do any work. Therefore we must
 			 * set the timeout to a next smallest value,
 			 * and 'select()' granularity is in us. */
-			timeout = NSEC_TIMEVAL(1000ULL); // 1us
+
+			/* Let's make it 1ms. */
+			timeout = NSEC_TIMEVAL(1000000ULL); // 1ms
 			int r = uevent_select(uevent, &timeout);
 			if (r != 0)
 				continue;
