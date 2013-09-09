@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 #include <libgen.h>
 #include <dlfcn.h>
@@ -383,4 +384,70 @@ int proc_running() {
 	}
 	FATAL("Can't read /proc/stat!");
 	return -1;
+}
+
+void ping_myself() {
+	static int cd = -1;
+	static int rd = -1;
+
+	if (cd == -1) {
+		int sd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP);
+		if (sd < 0)
+			PFATAL("socket()");
+		int one = 1;
+		int r = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char *) &one,
+				   sizeof(one));
+		if (r < 0)
+			PFATAL("setsockopt()");
+
+		struct sockaddr_in sin;
+		memset(&sin, 0, sizeof(sin));
+		sin.sin_family = AF_INET;
+		sin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+		sin.sin_port = 0; // assign any free
+		if (bind(sd, (void *)&sin, sizeof(sin)) < 0)
+			PFATAL("bind");
+
+		r = listen(sd, 16);
+		if (r < 0)
+			PFATAL("listen()");
+
+		struct sockaddr_in bind_sin;
+		socklen_t bind_sin_len = sizeof(bind_sin);
+		r = getsockname(sd, &bind_sin, &bind_sin_len);
+		if (r < 0)
+			PFATAL("getsockname()");
+		if (bind_sin_len != sizeof(bind_sin))
+			FATAL("getsockname length");
+
+
+		cd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP);
+		if (cd < 0)
+			PFATAL("socket()");
+
+		r = connect(cd, &bind_sin, sizeof(bind_sin));
+		if (r < 0)
+			PFATAL("connect()");
+
+		rd = accept(sd, NULL, NULL);
+		if (rd < 0)
+			PFATAL("accept()");
+
+		if (fcntl(rd, F_SETFD, FD_CLOEXEC) == -1)
+			PFATAL("fcntl(FD_CLOEXEC)");
+
+		/* Don't need bind socket anymore */
+		close(sd);
+	}
+
+	char buf[128];
+
+	int r = write(cd, buf, sizeof(buf));
+	if (r != 128)
+		PFATAL("write()");
+
+	r = read(rd, buf, sizeof(buf));
+	if (r != 128)
+		PFATAL("read()");
+
 }
