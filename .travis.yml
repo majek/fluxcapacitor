@@ -4,6 +4,9 @@ compiler:
   - clang
   - gcc
 
+env:
+  - FCPATH="$PWD/majek/fluxcapacitor/fluxcapacitor -o log -vvvv"
+
 branches:
   only:
     - master
@@ -14,6 +17,9 @@ install:
 
 script:
   - make test
+
+after_script:
+  - cat log
 
 notifications:
   email:
