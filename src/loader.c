@@ -363,7 +363,7 @@ int read_file(const char *fname, char *buf, int buf_sz) {
 int proc_running() {
 	static int fd = -1;
 	if (fd == -1) {
-		fd = open("/proc/stat", O_RDONLY);
+		fd = open("/proc/stat", O_RDONLY | O_CLOEXEC));
 	}
 
 	char buf[1024*16];
