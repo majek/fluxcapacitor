@@ -318,7 +318,15 @@ static u64 main_loop(char ***list_of_argv) {
 		if (min_child) {
 			s64 now = TIMESPEC_NSEC(&uevent_now) + parent->time_drift;
 			s64 speedup = min_child->blocked_until - now;
-			if (speedup > 0) {
+			/* Don't speed up less than 10ms */
+			if (speedup > 0 && speedup < 10 * 1000000) {
+				SHOUT("[ ] %i too small speedup on %s(), waiting",
+				      min_child->pid,
+				      syscall_to_str(min_child->syscall_no));
+				timeout = NSEC_TIMEVAL(speedup);
+				uevent_select(uevent, &timeout);
+				continue;
+			} else if (speedup > 0) {
 				SHOUT("[ ] %i speeding up %s() by %.3f sec",
 				      min_child->pid,
 				      syscall_to_str(min_child->syscall_no),
