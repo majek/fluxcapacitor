@@ -285,7 +285,7 @@ static u64 main_loop(char ***list_of_argv) {
 			 * sleeping state. They should be! */
 			struct child *woken = parent_woken_child(parent);
 			if (woken) {
-				PRINT("[ ] %i Process not in 'S' state",
+				PRINT(" ~  %i Process not in 'S' state",
 				      woken->pid);
 				timeout = NSEC_TIMEVAL(10 * 1000000ULL); // 10ms
 				int r = uevent_select(uevent, &timeout);
@@ -324,7 +324,7 @@ static u64 main_loop(char ***list_of_argv) {
 			min_child->interrupted = 1;
 			child_kill(min_child, options.signo);
 		} else {
-			SHOUT(" ! Can't speedup!");
+			SHOUT("[ ] Can't speedup!");
 			/* Wait for any event. */
 			uevent_select(uevent, NULL);
 		}
