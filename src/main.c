@@ -256,13 +256,13 @@ static u64 main_loop(char ***list_of_argv) {
 			 * set the timeout to a next smallest value,
 			 * and 'select()' granularity is in us. */
 
-			/* Let's make it 1ms. */
-			timeout = NSEC_TIMEVAL(1000000ULL); // 1ms
+			/* Let's make it 1us. */
+			timeout = NSEC_TIMEVAL(1000ULL); // 1us
 			int r = uevent_select(uevent, &timeout);
 			if (r != 0)
 				continue;
 
-			/* Finally, make sure all processes are in 'S'
+			/* Next, make sure all processes are in 'S'
 			 * sleeping state. They should be! */
 			struct child *woken = parent_woken_child(parent);
 			if (woken) {
@@ -274,6 +274,16 @@ static u64 main_loop(char ***list_of_argv) {
 					SHOUT("[ ] Waited for 10ms and nothing happened");
 				continue;
 			}
+
+			/* Finally, send something to myself using
+			 * localhost to make sure network buffers are
+			 * drained. */
+			ping_myself();
+
+			timeout = NSEC_TIMEVAL(0);
+			int r = uevent_select(uevent, &timeout);
+			if (r != 0)
+				continue;
 		}
 
 		/* All childs started? */
