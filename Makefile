@@ -26,10 +26,10 @@ $(LOADERNAME): Makefile $(LOADER_FILES)
 	$(CC) $(COPTS) $(LOADER_FILES) $(LDOPTS) \
 		-o $(LOADERNAME)
 
-
+FCPATH ?= $(PWD)/$(LOADERNAME)
 .PHONY:test
 test:
-	FCPATH="$(PWD)/$(LOADERNAME)" python tests/tests_basic.py
+	FCPATH="$(FCPATH)" python tests/tests_basic.py
 
 clean:
 	rm -f *.gcda *.so fluxcapacitor a.out gmon.out
