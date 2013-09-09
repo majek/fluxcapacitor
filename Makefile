@@ -7,7 +7,7 @@ COPTS=-g -ggdb -Wall -Wextra -Wno-unused-parameter -O3 -fPIC
 
 TESTLIB_FILES=src/testlib.c
 LIB_FILES=src/preload.c
-LOADER_FILES=src/wrapper.c src/parent.c src/loader.c src/uevent.c src/trace.c src/main.c
+LOADER_FILES=src/wrapper.c src/parent.c src/misc.c src/uevent.c src/trace.c src/main.c
 
 all: build test
 

@@ -94,7 +94,7 @@ struct child {
 };
 
 
-/* loader.c */
+/* misc.c */
 void pin_cpu();
 char ***argv_split(char **argv, const char *delimiter, int upper_bound);
 char *argv_join(char **argv, const char *delimiter);
