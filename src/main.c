@@ -285,15 +285,12 @@ static u64 main_loop(char ***list_of_argv) {
 			 * sleeping state. They should be! */
 			struct child *woken = parent_woken_child(parent);
 			if (woken) {
-				PRINT(" ~  %i not in 'S' state but in '%c'",
-				      woken->pid, child_process_status(woken));
-				timeout = NSEC_TIMEVAL(10 * 1000000ULL); // 10ms
-				int r = uevent_select(uevent, &timeout);
-				if (r == 0)
-					SHOUT("[ ] %i Waited for 10ms and "
-					      "nothing happened, state '%c'",
-					      woken->pid,
-					      child_process_status(woken));
+				int woken_pid = woken->pid;
+				SHOUT("[ ] %i not in 'S' state but in '%c'. "
+				      "Waiting for a state change.",
+				      woken_pid, child_process_status(woken));
+
+				uevent_select(uevent, NULL);
 				continue;
 			}
 
