@@ -181,7 +181,7 @@ class SingleProcess(tests.TestCase):
     def test_sleep_sort(self, filename=None):
         self.system("bash %s 5 3 6 3 6 3 1 4 7 > /dev/null" % (filename,))
 
-    @at_most(seconds=2.0)
+    @at_most(seconds=10.0)
     def test_parallel_sleeps(self):
         for i in range(10):
             stdout = self.system(' -- '.join(['bash -c "date +%s"',
@@ -193,7 +193,7 @@ class SingleProcess(tests.TestCase):
             assert 55 < (c - b) < 65, str(c-b)
             assert 110 < (c - a) < 130, str(c-a)
 
-    @at_most(seconds=2.0)
+    @at_most(seconds=3.0)
     def test_file_descriptor_leak(self):
         out = subprocess.check_output("ls /proc/self/fd", shell=True)
         normal_fds = len(out.split('\n'))

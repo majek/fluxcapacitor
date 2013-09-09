@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <signal.h>
 #include <sched.h>
+#include <fcntl.h>
 
 #include "types.h"
 #include "list.h"
@@ -20,6 +21,7 @@ static void usage() {
 "\n"
 "Options:\n"
 "\n"
+"  --output=FILENAME    Write logs to FILENAME instead of stderr.\n"
 "  --libpath=PATH       Load " PRELOAD_LIBNAME " from\n"
 "                       selected PATH directory.\n"
 "  --signal=SIGNAL      Use specified signal to interrupt blocking\n"
@@ -52,6 +54,7 @@ int main(int argc, char **argv) {
 	while (1) {
 		int option_index = 0;
 		static struct option long_options[] = {
+			{"output",     required_argument, 0, 'o' },
 			{"libpath",    required_argument, 0,  0  },
 			{"help",       no_argument,       0, 'h' },
 			{"verbose",    no_argument,       0, 'v' },
@@ -59,7 +62,7 @@ int main(int argc, char **argv) {
 			{0,            0,                 0,  0  }
 		};
 
-		int arg = getopt_long(argc, argv, "vh",
+		int arg = getopt_long(argc, argv, "vho:",
 				      long_options, &option_index);
 		if (arg == -1) {
 			break;
@@ -86,6 +89,22 @@ int main(int argc, char **argv) {
 		case 'h':
 			usage();
 			break;
+
+		case 'o': {
+			if (strcmp(optarg, "-") == 0) {
+				options.shoutstream = stdout;
+			} else {
+				FILE *f = fopen(optarg, "a+");
+				if (f == NULL)
+					PFATAL("fopen(%s)", optarg);
+				if (fcntl(fileno(f), F_SETFD, FD_CLOEXEC) == -1)
+					PFATAL("fcntl(FD_CLOEXEC)");
+				options.shoutstream = f;
+			}
+			/* Make sure there's something to be logged */
+			if (options.verbose == 0)
+				options.verbose += 1;
+			break; }
 
 		default:
 			FATAL("Unknown option: %s", argv[optind]);
@@ -266,7 +285,7 @@ static u64 main_loop(char ***list_of_argv) {
 			 * sleeping state. They should be! */
 			struct child *woken = parent_woken_child(parent);
 			if (woken) {
-				SHOUT("[ ] %i Process not in 'S' state",
+				PRINT("[ ] %i Process not in 'S' state",
 				      woken->pid);
 				timeout = NSEC_TIMEVAL(10 * 1000000ULL); // 10ms
 				int r = uevent_select(uevent, &timeout);

@@ -99,21 +99,18 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 		FATAL("");
 	}
 
-	if (type != TYPE_FOREVER) {
-		PRINT(" ~  %i blocking on %s() for %.3f sec",
-		      child->pid, syscall_to_str(sysarg->number), timeout / 1000000000.);
-	} else {
-		PRINT(" ~  %i blocking on %s() forever",
-		      child->pid, syscall_to_str(sysarg->number));
-	}
-
-
 	switch (timeout) {
 	case TIMEOUT_UNKNOWN:
 	case TIMEOUT_FOREVER:
+		PRINT(" ~  %i blocking on %s() %s",
+		      child->pid, syscall_to_str(sysarg->number),
+		      timeout == TIMEOUT_FOREVER ? "forever" : "unknow timeout");
 		child->blocked_until = timeout;
 		break;
 	default:
+		PRINT(" ~  %i blocking on %s() for %.3f sec",
+		      child->pid, syscall_to_str(sysarg->number),
+		      timeout / 1000000000.);
 		child->blocked_until = (TIMESPEC_NSEC(&uevent_now) +
 					child->parent->time_drift + timeout);
 	}
