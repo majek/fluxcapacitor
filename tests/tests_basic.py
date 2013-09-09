@@ -33,33 +33,33 @@ echo
 '''
 
 class SingleProcess(tests.TestCase):
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     def test_bash_sleep(self):
         self.system("sleep 10")
 
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     def test_bash_bash_sleep(self):
         self.system("bash -c 'sleep 120;'")
 
 
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     def test_python_sleep(self):
         self.system('python -c "import time; time.sleep(10)"')
 
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     def test_python_select(self):
         self.system('python -c "import select; select.select([],[],[], 10)"')
 
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     def test_python_poll(self):
         self.system('python -c "import select; select.poll().poll(10000)"')
 
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     def test_python_epoll(self):
         self.system('python -c "import select; select.epoll().poll(10000)"')
 
 
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     def test_node_epoll(self):
         if node_present:
             self.system('node -e "setTimeout(function(){},10000);"')
@@ -74,7 +74,7 @@ class SingleProcess(tests.TestCase):
         self.system('python -c "import sys; sys.exit(-1)"', returncode=255)
 
 
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     @compile(code='''
     #include <unistd.h>
     int main() {
@@ -85,7 +85,7 @@ class SingleProcess(tests.TestCase):
         self.system(compiled)
 
 
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     @compile(code='''
     #include <time.h>
     int main() {
@@ -98,7 +98,7 @@ class SingleProcess(tests.TestCase):
 
 
 
-    @at_most(seconds=5.0)
+    @at_most(seconds=5)
     @savefile(suffix="erl", text='''\
     #!/usr/bin/env escript
     %%! -smp disable +A1 +K true -noinput
@@ -111,7 +111,7 @@ class SingleProcess(tests.TestCase):
         if erlang_present:
             self.system("escript %s" % (filename,))
 
-    @at_most(seconds=5.0)
+    @at_most(seconds=5)
     @savefile(suffix="erl", text='''\
     #!/usr/bin/env escript
     %%! -smp enable +A30 +K true -noinput
@@ -124,7 +124,7 @@ class SingleProcess(tests.TestCase):
         if erlang_present:
             self.system("escript %s" % (filename,))
 
-    @at_most(seconds=5.0)
+    @at_most(seconds=5)
     @savefile(suffix="erl", text='''\
     #!/usr/bin/env escript
     %%! -smp enable +A30 +K false -noinput
@@ -138,7 +138,7 @@ class SingleProcess(tests.TestCase):
             self.system("escript %s" % (filename,))
 
 
-    @at_most(seconds=5.0)
+    @at_most(seconds=5)
     @savefile(suffix="erl", text='''\
     #!/usr/bin/env escript
     %%! -smp disable +A1 +K true -noinput
@@ -166,22 +166,22 @@ class SingleProcess(tests.TestCase):
             self.system("escript %s" % (filename,))
 
 
-    @at_most(seconds=0.5)
+    @at_most(seconds=2)
     def test_perl_sleep(self):
         self.system("perl -e 'sleep 10'")
 
 
-    @at_most(seconds=5.0)
+    @at_most(seconds=5)
     @savefile(suffix="sh", text=sleep_sort_script)
     def test_sleep_sort(self, filename=None):
         self.system("bash %s 1 12 1231 123213 13212 > /dev/null" % (filename,))
 
-    @at_most(seconds=5.0)
+    @at_most(seconds=5)
     @savefile(suffix="sh", text=sleep_sort_script)
     def test_sleep_sort(self, filename=None):
         self.system("bash %s 5 3 6 3 6 3 1 4 7 > /dev/null" % (filename,))
 
-    @at_most(seconds=10.0)
+    @at_most(seconds=10)
     def test_parallel_sleeps(self):
         for i in range(10):
             stdout = self.system(' -- '.join(['bash -c "date +%s"',
@@ -193,7 +193,7 @@ class SingleProcess(tests.TestCase):
             assert 55 < (c - b) < 65, str(c-b)
             assert 110 < (c - a) < 130, str(c-a)
 
-    @at_most(seconds=3.0)
+    @at_most(seconds=3)
     def test_file_descriptor_leak(self):
         out = subprocess.check_output("ls /proc/self/fd", shell=True)
         normal_fds = len(out.split('\n'))
