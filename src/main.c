@@ -302,10 +302,12 @@ static u64 main_loop(char ***list_of_argv) {
 			 * drained. */
 			ping_myself();
 
-			timeout = NSEC_TIMEVAL(0);
-			r = uevent_select(uevent, &timeout);
-			if (r != 0)
-				continue;
+			if (parent->child_count) {
+				timeout = NSEC_TIMEVAL(0);
+				r = uevent_select(uevent, &timeout);
+				if (r != 0)
+					continue;
+			}
 		}
 
 		/* All childs started? */
@@ -347,7 +349,8 @@ static u64 main_loop(char ***list_of_argv) {
 		} else {
 			SHOUT("[ ] Can't speedup!");
 			/* Wait for any event. */
-			uevent_select(uevent, NULL);
+			if (parent->child_count)
+				uevent_select(uevent, NULL);
 		}
 	}
 	parent_kill_all(parent, SIGINT);
