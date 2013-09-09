@@ -281,7 +281,7 @@ static u64 main_loop(char ***list_of_argv) {
 			ping_myself();
 
 			timeout = NSEC_TIMEVAL(0);
-			int r = uevent_select(uevent, &timeout);
+			r = uevent_select(uevent, &timeout);
 			if (r != 0)
 				continue;
 		}
