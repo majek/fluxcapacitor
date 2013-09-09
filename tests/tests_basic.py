@@ -193,6 +193,19 @@ class SingleProcess(tests.TestCase):
             assert 55 < (c - b) < 65, str(c-b)
             assert 110 < (c - a) < 130, str(c-a)
 
+    @at_most(seconds=2.0)
+    def test_file_descriptor_leak(self):
+        out = subprocess.check_output("ls /proc/self/fd", shell=True)
+        normal_fds = len(out.split('\n'))
+        stdout = self.system(' -- '.join(['sleep 1',
+                                          'sleep 60',
+                                          'sleep 120',
+                                          'bash -c "sleep 180; ls /proc/self/fd"']),
+                             capture_stdout=True)
+        after_fork_fds = len(stdout.split('\n'))
+        assert normal_fds == after_fork_fds
+
+
 if __name__ == '__main__':
     import unittest
     unittest.main()
