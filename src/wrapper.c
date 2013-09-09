@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/prctl.h>
 
 #include "list.h"
 #include "types.h"
@@ -55,6 +56,16 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 		/* Second argument to nanosleep() can be ignored, it's
 		   only supposed to be set on EINTR. */
 		type = TYPE_TIMESPEC; value = sysarg->arg1;
+		break;
+
+	/* Anti-debugging machinery. Prevent processes from disabling ptrace. */
+	case __NR_prctl:
+		if (sysarg->arg1 == PR_SET_DUMPABLE && sysarg->arg2 == 0) {
+			SHOUT("[ ] %i pacyfying prctl(PR_SET_DUMPABLE, 0)",
+			      child->pid);
+			sysarg->arg2 = 1;
+			trace_setregs(child->process, sysarg);
+		}
 		break;
 	}
 
