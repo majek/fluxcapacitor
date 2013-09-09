@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "list.h"
 #include "types.h"
@@ -53,22 +57,30 @@ struct child *parent_min_timeout_child(struct parent *parent) {
 	return min_child;
 }
 
+char child_process_status(struct child *child) {
+	char buf[1024];
+
+	int r = pread(child->stat_fd, buf, sizeof(buf), 0);
+	if (r < 16 || r == sizeof(buf))
+		PFATAL("pread(): Error while reading /proc/%i/stat", child->pid);
+	buf[r] = '\0';
+
+	// Let's pray there aren't parenthesis in the program name
+	char *p = strchr(buf, ')');
+	if (p[0] != ')')
+		FATAL("");
+	if (p[1] != ' ')
+		FATAL("");
+	return p[2];
+}
+
 struct child *parent_woken_child(struct parent *parent) {
 	struct list_head *pos;
 	list_for_each(pos, &parent->list_of_childs) {
 		struct child *child = hlist_entry(pos, struct child, in_childs);
-		char fname[64];
-		snprintf(fname, sizeof(fname), "/proc/%i/stat", child->pid);
-		char buf[1024];
-		if (read_file(fname, buf, sizeof(buf)) < 16)
-			FATAL("%s is too small", fname);
-		// pray for a program name without parenthesis
-		char *p = strchr(buf, ')');
-		if (p[0] != ')')
-			FATAL("");
-		if (p[1] != ' ')
-			FATAL("");
-		if (p[2] != 'S')
+
+		char st = child_process_status(child);
+		if (st != 'S')
 			return child;
 	}
 	return NULL;
@@ -86,12 +98,21 @@ void child_kill(struct child *child, int signo) {
 	kill(child->pid, signo);
 }
 
-struct child *child_new(struct parent *parent, struct trace_process *process, int pid) {
+struct child *child_new(struct parent *parent, struct trace_process *process,
+			int pid) {
 	struct child *child = calloc(1, sizeof(struct child));
 	child->blocked_until = TIMEOUT_UNKNOWN;
 	child->pid = pid;
 	child->process = process;
 	child->parent = parent;
+
+	char fname[64];
+	snprintf(fname, sizeof(fname), "/proc/%i/stat", pid);
+
+	child->stat_fd = open(fname, O_RDONLY | O_CLOEXEC);
+	if (child->stat_fd < 0)
+		PFATAL("open(%s, O_RDONLY)", fname);
+
 	list_add(&child->in_childs, &parent->list_of_childs);
 	parent->child_count += 1;
 	return child;
@@ -103,6 +124,7 @@ void child_del(struct child *child) {
 	list_del(&child->in_childs);
 	child->pid = 0;
 	child->parent->child_count -= 1;
+	close(child->stat_fd);
 	free(child);
 }
 

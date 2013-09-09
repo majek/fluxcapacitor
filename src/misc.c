@@ -348,19 +348,6 @@ const char *syscall_to_str(int no) {
 	return r;
 }
 
-int read_file(const char *fname, char *buf, int buf_sz) {
-	int fd = open(fname, O_RDONLY);
-	if (fd < 0)
-		PFATAL("open(%s, O_RDONLY)", fname);
-	int r = read(fd, buf, buf_sz-1);
-	if (r < 0)
-		PFATAL("read()");
-	close(fd);
-
-	buf[r] = '\0';
-	return r;
-}
-
 int proc_running() {
 	static int fd = -1;
 	if (fd == -1) {
