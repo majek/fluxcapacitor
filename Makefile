@@ -3,7 +3,7 @@ TESTLIBNAME=fluxcapacitor_test.so
 LOADERNAME=fluxcapacitor
 
 LDOPTS+=-lrt -ldl -rdynamic
-COPTS+=-g -ggdb -Wall -Wextra -Wno-unused-parameter -O3 -fPIC
+COPTS+=$(CFLAGS) -g -ggdb -Wall -Wextra -Wno-unused-parameter -O3 -fPIC
 
 TESTLIB_FILES=src/testlib.c
 LIB_FILES=src/preload.c

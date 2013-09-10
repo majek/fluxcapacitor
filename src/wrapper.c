@@ -134,7 +134,7 @@ int wrapper_syscall_exit(struct child *child, struct trace_sysarg *sysarg) {
 
 	switch (sysarg->number) {
 
-	case __NR_clock_gettime:{
+	case __NR_clock_gettime: {
 		if (sysarg->ret == 0) {
 			if (sysarg->arg1 != CLOCK_REALTIME && sysarg->arg1 != CLOCK_MONOTONIC)
 				FATAL("%li ", sysarg->arg1);
