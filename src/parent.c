@@ -57,12 +57,12 @@ struct child *parent_min_timeout_child(struct parent *parent) {
 	return min_child;
 }
 
-char child_process_status(struct child *child) {
+static char read_process_status(int stat_fd) {
 	char buf[1024];
 
-	int r = pread(child->stat_fd, buf, sizeof(buf), 0);
+	int r = pread(stat_fd, buf, sizeof(buf), 0);
 	if (r < 16 || r == sizeof(buf))
-		PFATAL("pread(): Error while reading /proc/%i/stat", child->pid);
+		PFATAL("pread(): Error while reading /proc/[pid]/stat");
 	buf[r] = '\0';
 
 	// Let's pray there aren't parenthesis in the program name
@@ -79,8 +79,8 @@ struct child *parent_woken_child(struct parent *parent) {
 	list_for_each(pos, &parent->list_of_childs) {
 		struct child *child = hlist_entry(pos, struct child, in_childs);
 
-		char st = child_process_status(child);
-		if (st != 'S')
+		child->stat = read_process_status(child->stat_fd);
+		if (child->stat != 'S')
 			return child;
 	}
 	return NULL;

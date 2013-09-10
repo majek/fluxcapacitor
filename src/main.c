@@ -288,7 +288,7 @@ static u64 main_loop(char ***list_of_argv) {
 				int woken_pid = woken->pid;
 				SHOUT("[ ] %i not in 'S' state but in '%c'. "
 				      "Waiting for a state change.",
-				      woken_pid, child_process_status(woken));
+				      woken_pid, woken->stat);
 
 				uevent_select(uevent, NULL);
 				continue;

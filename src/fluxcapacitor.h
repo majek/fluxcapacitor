@@ -93,6 +93,7 @@ struct child {
 	int syscall_no;
 
 	int stat_fd;
+	char stat;
 };
 
 
@@ -121,7 +122,6 @@ struct parent *parent_new();
 void parent_run_one(struct parent *parent, struct trace *trace,
 		    char **child_argv);
 struct child *parent_min_timeout_child(struct parent *parent);
-char child_process_status(struct child *child);
 struct child *parent_woken_child(struct parent *parent);
 void parent_kill_all(struct parent *parent, int signo);
 
