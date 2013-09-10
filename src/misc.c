@@ -335,17 +335,15 @@ int str_to_time(const char *s, u64 *timens_ptr) {
 }
 
 const char *syscall_to_str(int no) {
-	static char buf[32];
-	const char *r = NULL;
 	const int map_sz = sizeof(syscall_to_str_map) / sizeof(syscall_to_str_map[0]);
 	if (no >= 0 && no < map_sz) {
-		r = syscall_to_str_map[no];
+		const char *r = syscall_to_str_map[no];
+		if (r != NULL) return r;
 	}
-	if (!r) {
-		snprintf(buf, sizeof(buf), "syscall_%i", no);
-		r = buf;
-	}
-	return r;
+
+	static char buf[32];
+	snprintf(buf, sizeof(buf), "syscall_%i", no);
+	return buf;
 }
 
 int proc_running() {

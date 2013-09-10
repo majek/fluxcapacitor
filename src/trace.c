@@ -189,7 +189,7 @@ int trace_process_count(struct trace *trace) {
 	return trace->process_count;
 }
 
-
+/* It's okay to return -1, we can use memcpy using ptrace. */
 static int mem_fd_open(int pid) {
 	char path[64];
 	snprintf(path, sizeof(path), "/proc/%i/mem", pid);
@@ -254,16 +254,14 @@ int trace_execvp(struct trace *trace, char **argv) {
 }
 
 static struct trace_process *process_by_pid(struct trace *trace, int pid) {
-	struct trace_process *process = NULL;
 	struct hlist_node *pos;
 	hlist_for_each(pos, &trace->hpids[pid % HPIDS_SIZE]) {
-		process = hlist_entry(pos, struct trace_process, node);
-		if (process->pid == pid) {
-			break;
-		}
-		process = NULL;
+		struct trace_process *process = \
+			hlist_entry(pos, struct trace_process, node);
+		if (process->pid == pid)
+			return process;
 	}
-	return process;
+	return NULL;
 }
 
 static void ptrace_prepare(int pid) {
