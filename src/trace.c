@@ -278,8 +278,8 @@ static void ptrace_prepare(int pid) {
 		PFATAL("ptrace(PTRACE_SETOPTIONS)");
 }
 
-static int process_stoped(struct trace *trace, struct trace_process *process,
-			  int signal) {
+static int process_stopped(struct trace *trace, struct trace_process *process,
+			   int signal) {
 
 	int pid = process->pid;
 	int inject_signal = 0;
@@ -360,7 +360,7 @@ static void process_evaluate(struct trace *trace,
 		if (WIFSTOPPED(status)) {
 			/* We can't use WSTOPSIG(status) - it cuts high bits. */
 			int signal = (status >> 8) & 0xffff;
-			inject_signal = process_stoped(trace, process, signal);
+			inject_signal = process_stopped(trace, process, signal);
 		} else
 		if (WIFSIGNALED(status) || WIFEXITED(status)) {
 			struct trace_exitarg exitarg;
