@@ -206,6 +206,13 @@ class SingleProcess(tests.TestCase):
         assert normal_fds == after_fork_fds
 
 
+    @at_most(seconds=4)
+    def test_2546_wraparound(self):
+        stdout = self.system("bash -c 'for i in `seq 1 55`; do sleep 315360000; done; date +%Y'",
+                             capture_stdout=True)
+        assert int(stdout) > 2500
+
+
 if __name__ == '__main__':
     import unittest
     unittest.main()

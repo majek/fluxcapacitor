@@ -39,7 +39,7 @@ static void usage() {
 /* Global */
 struct options options;
 
-static u64 main_loop(char ***list_of_argv);
+static s128 main_loop(char ***list_of_argv);
 
 int main(int argc, char **argv) {
 
@@ -210,7 +210,7 @@ static int on_trace(struct trace_process *process, int type, void *arg,
 	return 0;
 }
 
-static u64 main_loop(char ***list_of_argv) {
+static s128 main_loop(char ***list_of_argv) {
 	struct timeval timeout;
 
 	struct parent *parent = parent_new();
@@ -275,8 +275,7 @@ static u64 main_loop(char ***list_of_argv) {
 			 * set the timeout to a next smallest value,
 			 * and 'select()' granularity is in us. */
 
-			/* Let's make it 1us. */
-			timeout = NSEC_TIMEVAL(1000ULL); // 1us
+			timeout = NSEC_TIMEVAL(1000ULL);
 			int r = uevent_select(uevent, &timeout);
 			if (r != 0)
 				continue;
@@ -290,7 +289,8 @@ static u64 main_loop(char ***list_of_argv) {
 				      "Waiting for a state change.",
 				      woken_pid, woken->stat);
 
-				uevent_select(uevent, NULL);
+				timeout = NSEC_TIMEVAL(1000000ULL);
+				uevent_select(uevent, &timeout);
 				continue;
 			}
 
@@ -318,8 +318,8 @@ static u64 main_loop(char ***list_of_argv) {
 		/* Hurray, we're most likely waiting for a timeout. */
 		struct child *min_child = parent_min_timeout_child(parent);
 		if (min_child) {
-			s64 now = TIMESPEC_NSEC(&uevent_now) + parent->time_drift;
-			s64 speedup = min_child->blocked_until - now;
+			s128 now = (s128)TIMESPEC_NSEC(&uevent_now) + parent->time_drift;
+			s128 speedup = min_child->blocked_until - now;
 			/* Don't speed up less than 10ms */
 			if (speedup > 0 && speedup < 10 * 1000000) {
 				SHOUT("[ ] %i too small speedup on %s(), waiting",
@@ -346,15 +346,17 @@ static u64 main_loop(char ***list_of_argv) {
 		} else {
 			SHOUT("[ ] Can't speedup!");
 			/* Wait for any event. */
-			if (parent->child_count)
-				uevent_select(uevent, NULL);
+			if (parent->child_count) {
+				timeout = NSEC_TIMEVAL(1000000000ULL);
+				uevent_select(uevent, &timeout);
+			}
 		}
 	}
 	parent_kill_all(parent, SIGINT);
 
 	trace_free(trace);
 
-	u64 time_drift = parent->time_drift;
+	s128 time_drift = parent->time_drift;
 	free(parent);
 	free(uevent);
 

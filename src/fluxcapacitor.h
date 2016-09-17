@@ -71,7 +71,7 @@ struct parent {
 
 	int started;
 
-	u64 time_drift;
+	s128 time_drift;
 };
 
 
@@ -83,7 +83,7 @@ struct child {
 	struct list_head in_blocked;
 
 	int blocked;
-	s64 blocked_until;
+	s128 blocked_until;
 
 	struct parent *parent;
 	struct trace_process *process;
@@ -114,7 +114,7 @@ void ping_myself();
 /* parent.c */
 #define TIMEOUT_UNKNOWN (-1LL)
 /* 2**63 - 1, LLONG_MAX but not depending on limits.h */
-#define	TIMEOUT_FOREVER (+9223372036854775807LL)
+#define	TIMEOUT_FOREVER (-2LL)
 
 struct trace;
 struct trace_process;

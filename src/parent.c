@@ -49,9 +49,10 @@ struct child *parent_min_timeout_child(struct parent *parent) {
 			}
 		}
 	}
+
 	if (!min_child ||
 	    min_child->blocked_until <= 0 ||
-	    min_child->blocked_until >= TIMEOUT_FOREVER) {
+	    min_child->blocked_until == TIMEOUT_FOREVER) {
 		return NULL;
 	}
 	return min_child;
