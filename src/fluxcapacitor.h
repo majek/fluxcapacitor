@@ -46,7 +46,7 @@ struct options {
 	/* Should we exit? */
 	int exit_forced;
 
-	/* Max exit status of the exited childs (unsinged) */
+	/* Max exit status of the exited children (unsigned) */
 	unsigned exit_status;
 
 	/* Signo we'll use to continue the child. Must not be used by
@@ -64,7 +64,7 @@ struct options {
 
 struct parent {
 	int child_count;
-	struct list_head list_of_childs;
+	struct list_head list_of_children;
 
 	int blocked_count;
 	struct list_head list_of_blocked;
@@ -79,7 +79,7 @@ struct trace_process;
 
 struct child {
 	int pid;
-	struct list_head in_childs;
+	struct list_head in_children;
 	struct list_head in_blocked;
 
 	int blocked;

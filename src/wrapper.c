@@ -115,7 +115,7 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 	case TIMEOUT_FOREVER:
 		PRINT(" ~  %i blocking on %s() %s",
 		      child->pid, syscall_to_str(sysarg->number),
-		      timeout == TIMEOUT_FOREVER ? "forever" : "unknow timeout");
+		      timeout == TIMEOUT_FOREVER ? "forever" : "unknown timeout");
 		child->blocked_until = timeout;
 		break;
 	default:

@@ -18,7 +18,7 @@ extern struct options options;
 struct parent *parent_new() {
 	struct parent *parent = calloc(1, sizeof(struct parent));
 
-	INIT_LIST_HEAD(&parent->list_of_childs);
+	INIT_LIST_HEAD(&parent->list_of_children);
 	INIT_LIST_HEAD(&parent->list_of_blocked);
 
 	return parent;
@@ -35,13 +35,13 @@ void parent_run_one(struct parent *parent, struct trace *trace,
 struct child *parent_min_timeout_child(struct parent *parent) {
 	struct child *min_child = NULL;
 
-	/* All childs must be blocking */
+	/* All children must be blocking */
 	if (parent->blocked_count != parent->child_count)
 		FATAL("");
 
 	struct list_head *pos;
-	list_for_each(pos, &parent->list_of_childs) {
-		struct child *child = hlist_entry(pos, struct child, in_childs);
+	list_for_each(pos, &parent->list_of_children) {
+		struct child *child = hlist_entry(pos, struct child, in_children);
 		if (child->blocked_until != TIMEOUT_UNKNOWN) {
 			if (!min_child ||
 			    min_child->blocked_until > child->blocked_until) {
@@ -77,8 +77,8 @@ static char read_process_status(int stat_fd) {
 
 struct child *parent_woken_child(struct parent *parent) {
 	struct list_head *pos;
-	list_for_each(pos, &parent->list_of_childs) {
-		struct child *child = hlist_entry(pos, struct child, in_childs);
+	list_for_each(pos, &parent->list_of_children) {
+		struct child *child = hlist_entry(pos, struct child, in_children);
 
 		child->stat = read_process_status(child->stat_fd);
 		if (child->stat != 'S')
@@ -89,8 +89,8 @@ struct child *parent_woken_child(struct parent *parent) {
 
 void parent_kill_all(struct parent *parent, int signo) {
 	struct list_head *pos;
-	list_for_each(pos, &parent->list_of_childs) {
-		struct child *child = hlist_entry(pos, struct child, in_childs);
+	list_for_each(pos, &parent->list_of_children) {
+		struct child *child = hlist_entry(pos, struct child, in_children);
 		kill(child->pid, signo);
 	}
 }
@@ -114,7 +114,7 @@ struct child *child_new(struct parent *parent, struct trace_process *process,
 	if (child->stat_fd < 0)
 		PFATAL("open(%s, O_RDONLY)", fname);
 
-	list_add(&child->in_childs, &parent->list_of_childs);
+	list_add(&child->in_children, &parent->list_of_children);
 	parent->child_count += 1;
 	return child;
 }
@@ -122,7 +122,7 @@ struct child *child_new(struct parent *parent, struct trace_process *process,
 void child_del(struct child *child) {
 	if (child->blocked)
 		child_mark_unblocked(child);
-	list_del(&child->in_childs);
+	list_del(&child->in_children);
 	child->pid = 0;
 	child->parent->child_count -= 1;
 	close(child->stat_fd);
