@@ -440,11 +440,11 @@ int trace_read(struct trace *trace) {
 		counter += 1;
 	}
 
-	/* Process waitpids from processess we don't know only after
+	/* Process waitpids from processes we don't know only after
 	 * all known processes were handled. This is required due to a
 	 * race: we might get info from a new child process before
 	 * parent tells us he did clone/fork. We end up in a report
-	 * from an uknonwn process in such case. */
+	 * from an unknown process in such case. */
 	struct list_head *pos, *tmp;
 	list_for_each_safe(pos, tmp, &trace->list_of_waitpid_reports) {
 

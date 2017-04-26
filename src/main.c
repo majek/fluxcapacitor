@@ -307,7 +307,7 @@ static s128 main_loop(char ***list_of_argv) {
 			}
 		}
 
-		/* All childs started? */
+		/* All children started? */
 		if (*list_of_argv) {
 			parent_run_one(parent, trace, *list_of_argv);
 			list_of_argv ++;

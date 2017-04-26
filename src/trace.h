@@ -60,7 +60,7 @@ int trace_continue(struct trace_process *process,
  * TRACE_SYSCALL_* callback. */
 void trace_setregs(struct trace_process *process, struct trace_sysarg *sysarg);
 
-/* Copy data to and from a process. Data length and addres must be
+/* Copy data to and from a process. Data length and address must be
    word-aligned. */
 int copy_from_user(struct trace_process *process, void *dst,
 		   unsigned long src, size_t len);

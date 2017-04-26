@@ -30,7 +30,7 @@ Another comparable project is:
 can fake the time functions, but doesn't affect the runtime of the
 program. Conversely, `fluxcapacitor` will make your program run faster
 and be 100% CPU constrained. It does that by "speeding up" blocking
-syscalls. Faking time is a neccessary side effect.
+syscalls. Faking time is a necessary side effect.
 
 
 Internally,`Fluxcapacitor` uses `ptrace` on syscalls and `LD_PRELOAD`,
