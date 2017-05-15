@@ -43,20 +43,20 @@ class SingleProcess(tests.TestCase):
 
 
     @at_most(seconds=2)
-    def test_python_sleep(self):
-        self.system('python -c "import time; time.sleep(10)"')
+    def test_python2_sleep(self):
+        self.system('python2 -c "import time; time.sleep(10)"')
 
     @at_most(seconds=2)
-    def test_python_select(self):
-        self.system('python -c "import select; select.select([],[],[], 10)"')
+    def test_python2_select(self):
+        self.system('python2 -c "import select; select.select([],[],[], 10)"')
 
     @at_most(seconds=2)
-    def test_python_poll(self):
-        self.system('python -c "import select; select.poll().poll(10000)"')
+    def test_python2_poll(self):
+        self.system('python2 -c "import select; select.poll().poll(10000)"')
 
     @at_most(seconds=2)
-    def test_python_epoll(self):
-        self.system('python -c "import select; select.epoll().poll(10000)"')
+    def test_python2_epoll(self):
+        self.system('python2 -c "import select; select.epoll().poll(10000)"')
 
 
     @at_most(seconds=2)
@@ -70,8 +70,8 @@ class SingleProcess(tests.TestCase):
                     returncode=127, ignore_stderr=True)
 
     def test_return_status(self):
-        self.system('python -c "import sys; sys.exit(188)"', returncode=188)
-        self.system('python -c "import sys; sys.exit(-1)"', returncode=255)
+        self.system('python2 -c "import sys; sys.exit(188)"', returncode=188)
+        self.system('python2 -c "import sys; sys.exit(-1)"', returncode=255)
 
 
     @at_most(seconds=2)

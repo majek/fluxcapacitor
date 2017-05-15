@@ -89,7 +89,7 @@ systems):
 
 Finally, `fluxcapacitor` works with any programming language:
 
-    $ ./fluxcapacitor -- python -c "import time; time.sleep(1000)"
+    $ ./fluxcapacitor -- python2 -c "import time; time.sleep(1000)"
 
 
 For reference, `fluxcapacitor` usage info:
@@ -216,8 +216,8 @@ and wait for some time. With `fluxcapacitor` you write a
 [wrapper program](https://github.com/majek/fluxcapacitor/blob/master/examples/slowecho/run_test.py):
 
 
-```python
-#!/usr/bin/env python
+```python2
+#!/usr/bin/env python2
 
 import os
 import time
@@ -225,23 +225,23 @@ import signal
 
 server_pid = os.fork()
 if server_pid == 0:
-    os.execv("/usr/bin/python", ["python", "server.py"])
+    os.execv("/usr/bin/python2", ["python2", "server.py"])
     os._exit(0)
 else:
     time.sleep(1)
-    os.system("python tests.py")
+    os.system("python2 tests.py")
     os.kill(server_pid, signal.SIGINT)
 ```
 
 This script just runs the tests in an automated manner. Normally the
 tests take 1 second each:
 
-    $ time python run_test.py
+    $ time python2 run_test.py
     real    0m5.112s
 
 With `fluxcapacitor` it's much faster:
 
-    $ ./fluxcapacitor -- python run_test.py
+    $ ./fluxcapacitor -- python2 run_test.py
     real    0m0.355s
 
 
@@ -284,5 +284,5 @@ You can also run specific tests, but that's a bit more complex. For
 example to run `SingleProcess.test_bash_sleep` from `tests/tests_basic.py`:
 
     FCPATH="$PWD/fluxcapacitor --libpath=$PWD" \
-        python tests/tests_basic.py SingleProcess.test_bash_sleep
+        python2 tests/tests_basic.py SingleProcess.test_bash_sleep
 
