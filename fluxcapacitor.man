@@ -1,0 +1,48 @@
+.TH FLUXCAPACITOR 1 "2018-01-13" "" "User Commands Manual"
+.SH NAME
+fluxcapacitor \- run programs without blocking on syscalls
+.SH SYNOPSIS
+.SY fluxcapacitor
+.OP \-\-libpath PATH
+.OP \-\-output FILENAME
+.OP \-\-signal SIGNAL
+.OP \-\-verbose
+\-\- command [\fIarguments...\fR]
+.YS
+.SY fluxcapacitor
+\-\- command1 [\fIargs...\fR]
+\-\- command2 [\fIargs...\fR] ...
+.YS
+.SH DESCRIPTION
+.B fluxcapacitor
+is a tool for making your program run without blocking on timeouts,
+on functions like poll and select, by spoofing POSIX time functions.
+By "patching" low-level syscalls, it can lie about time to any program
+in any programming language, as long as it runs on Linux.
+
+This approach has a significant advantage: it is possible to lie about time
+to many processes at the same time. It is especially useful for running
+network applications where server and client run in different processes
+which rely on time. It will also work with multithreaded applications.
+
+.B fluxcapacitor
+will make your program run faster and be 100% CPU constrained.
+It does that by "speeding up" blocking syscalls. Faking time is a necessary side effect.
+.SH OPTIONS
+.TP
+.B \-\-help
+Print usage instructions and exit.
+.TP
+\fB\-\-libpath\fR \fIPATH\fR
+Load \fIfluxcapacitor_preload.so\fR from selected \fIPATH\fR directory.
+.TP
+\fB\-\-output\fR \fIFILENAME\fR
+Write logs to \fIFILENAME\fR instead of stderr.
+.TP
+\fB\-\-signal\fR \fISIGNAL\fR
+Use specified \fISIGNAL\fR to interrupt blocking syscalls, instead of SIGURG.
+.TP
+.B \-v
+.TQ
+.B \-\-verbose
+Print more stuff. Repeat for debugging messages.
