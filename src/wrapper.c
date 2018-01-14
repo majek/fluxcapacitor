@@ -72,7 +72,7 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 	if (!type)
 		return;
 
-	s128 timeout = TIMEOUT_UNKNOWN;
+	flux_time timeout = TIMEOUT_UNKNOWN;
 	switch (type) {
 	case TYPE_MSEC:
 		if (value < 0) {
@@ -122,8 +122,8 @@ void wrapper_syscall_enter(struct child *child, struct trace_sysarg *sysarg) {
 		PRINT(" ~  %i blocking on %s() for %.3f sec",
 		      child->pid, syscall_to_str(sysarg->number),
 		      timeout / 1000000000.);
-		child->blocked_until = (s128)TIMESPEC_NSEC(&uevent_now) +
-			child->parent->time_drift + (s128)timeout;
+		child->blocked_until = (flux_time)TIMESPEC_NSEC(&uevent_now) +
+			child->parent->time_drift + (flux_time)timeout;
 	}
 	child->syscall_no = sysarg->number;
 }
@@ -140,7 +140,7 @@ int wrapper_syscall_exit(struct child *child, struct trace_sysarg *sysarg) {
 				FATAL("%li ", sysarg->arg1);
 			struct timespec ts;
 			clock_gettime(CLOCK_REALTIME, &ts);
-			s128 newtime = TIMESPEC_NSEC(&ts) + child->parent->time_drift;
+			flux_time newtime = TIMESPEC_NSEC(&ts) + child->parent->time_drift;
 			ts = NSEC_TIMESPEC(newtime);
 			copy_to_user(child->process, sysarg->arg2, &ts,
 				     sizeof(struct timespec));

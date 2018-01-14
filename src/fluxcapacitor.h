@@ -71,7 +71,7 @@ struct parent {
 
 	int started;
 
-	s128 time_drift;
+	flux_time time_drift;
 };
 
 
@@ -83,7 +83,7 @@ struct child {
 	struct list_head in_blocked;
 
 	int blocked;
-	s128 blocked_until;
+	flux_time blocked_until;
 
 	struct parent *parent;
 	struct trace_process *process;

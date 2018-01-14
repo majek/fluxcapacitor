@@ -39,7 +39,7 @@ static void usage() {
 /* Global */
 struct options options;
 
-static s128 main_loop(char ***list_of_argv);
+static flux_time main_loop(char ***list_of_argv);
 
 int main(int argc, char **argv) {
 
@@ -210,7 +210,7 @@ static int on_trace(struct trace_process *process, int type, void *arg,
 	return 0;
 }
 
-static s128 main_loop(char ***list_of_argv) {
+static flux_time main_loop(char ***list_of_argv) {
 	struct timeval timeout;
 
 	struct parent *parent = parent_new();
@@ -318,8 +318,8 @@ static s128 main_loop(char ***list_of_argv) {
 		/* Hurray, we're most likely waiting for a timeout. */
 		struct child *min_child = parent_min_timeout_child(parent);
 		if (min_child) {
-			s128 now = (s128)TIMESPEC_NSEC(&uevent_now) + parent->time_drift;
-			s128 speedup = min_child->blocked_until - now;
+			flux_time now = (flux_time)TIMESPEC_NSEC(&uevent_now) + parent->time_drift;
+			flux_time speedup = min_child->blocked_until - now;
 			/* Don't speed up less than 10ms */
 			if (speedup > 0 && speedup < 10 * 1000000) {
 				SHOUT("[ ] %i too small speedup on %s(), waiting",
@@ -356,7 +356,7 @@ static s128 main_loop(char ***list_of_argv) {
 
 	trace_free(trace);
 
-	s128 time_drift = parent->time_drift;
+	flux_time time_drift = parent->time_drift;
 	free(parent);
 	free(uevent);
 

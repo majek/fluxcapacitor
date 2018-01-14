@@ -12,7 +12,13 @@ typedef int8_t   s8;
 typedef int16_t  s16;
 typedef int32_t  s32;
 typedef int64_t  s64;
-typedef __int128  s128;
+
+#if defined(__x86_64__)
+	typedef __int128  s128;
+	typedef s128 flux_time;
+#else
+	typedef u64 flux_time;
+#endif
 
 
 #ifndef MIN
