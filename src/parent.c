@@ -39,7 +39,7 @@ struct child *parent_min_timeout_child(struct parent *parent) {
 	if (parent->blocked_count != parent->child_count)
 		FATAL("");
 
-	struct list_head *pos;
+	struct list_head *pos = NULL;
 	list_for_each(pos, &parent->list_of_children) {
 		struct child *child = hlist_entry(pos, struct child, in_children);
 		if (child->blocked_until != TIMEOUT_UNKNOWN) {
@@ -59,7 +59,7 @@ struct child *parent_min_timeout_child(struct parent *parent) {
 }
 
 static char read_process_status(int stat_fd) {
-	char buf[1024];
+	char buf[1024] = {0};
 
 	int r = pread(stat_fd, buf, sizeof(buf), 0);
 	if (r < 16 || r == sizeof(buf))
@@ -76,7 +76,7 @@ static char read_process_status(int stat_fd) {
 }
 
 struct child *parent_woken_child(struct parent *parent) {
-	struct list_head *pos;
+	struct list_head *pos = NULL;
 	list_for_each(pos, &parent->list_of_children) {
 		struct child *child = hlist_entry(pos, struct child, in_children);
 
@@ -88,7 +88,7 @@ struct child *parent_woken_child(struct parent *parent) {
 }
 
 void parent_kill_all(struct parent *parent, int signo) {
-	struct list_head *pos;
+	struct list_head *pos = NULL;
 	list_for_each(pos, &parent->list_of_children) {
 		struct child *child = hlist_entry(pos, struct child, in_children);
 		kill(child->pid, signo);
@@ -107,7 +107,7 @@ struct child *child_new(struct parent *parent, struct trace_process *process,
 	child->process = process;
 	child->parent = parent;
 
-	char fname[64];
+	char fname[64] = {0};
 	snprintf(fname, sizeof(fname), "/proc/%i/stat", pid);
 
 	child->stat_fd = open(fname, O_RDONLY | O_CLOEXEC);
